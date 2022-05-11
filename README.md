@@ -9,19 +9,19 @@ This project is in the early stages of development.
 Current features planned include:
 
 - [x] Oauth2 credential authentication (this project won't work without it)
-- [] Finding local stores with the Locations API
-- [] Checking prices on-demand
-- [] Tracking regular and sale prices over time
-- [] Creating reports of the best current sales 
-- [] Unit price comparisons
+- [ ] Finding local stores with the Locations API
+- [ ] Checking prices on-demand
+- [ ] Tracking regular and sale prices over time
+- [ ] Creating reports of the best current sales 
+- [ ] Unit price comparisons
 
 Eventual planned features:
-- [] Historical low price reports
-- [] Local search to reduce API calls
-- [] Local sub-lists
-- [] Scheduled refreshing
+- [ ] Historical low price reports
+- [ ] Local search to reduce API calls
+- [ ] Local sub-lists
+- [ ] Scheduled refreshing
 
 Dream goals:
-- [] Cross-checking against coupons
-- [] Rebates, too
-- [] Searching multiple stores concurrently
+- [ ] Cross-checking against coupons
+- [ ] Rebates, too
+- [ ] Searching multiple stores concurrently
