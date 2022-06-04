@@ -1,3 +1,4 @@
+import configparser
 import tkinter
 import tkinter.messagebox
 from tkinter import END
@@ -21,6 +22,7 @@ class App(customtkinter.CTk):
         self.state('zoomed')
 
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        
 
 
         # Create a grid to hold left and right side frames ============================================================
@@ -154,7 +156,7 @@ class App(customtkinter.CTk):
                                                         text="Enter your Secret:")
         self.credentials_secret_label.grid(row=3, column=0, sticky="w", padx=20, pady=20)
 
-        self.credentials_secret_entry = customtkinter.CTkEntry(master=self.settings_subframe_credentials)
+        self.credentials_secret_entry = customtkinter.CTkEntry(master=self.settings_subframe_credentials, show="*")
         self.credentials_secret_entry.grid(row=3, column=1, sticky="w", padx=20, pady=20)
 
         self.credentials_button = customtkinter.CTkButton(master=self.settings_subframe_credentials, text="Check your credentials",)
@@ -188,6 +190,16 @@ class App(customtkinter.CTk):
         self.stores_select_button = customtkinter.CTkButton(master=self.settings_subframe_stores, text="Select this store", command=self.stores_select_button_event)
         self.stores_select_button.grid(row=3, column=3, rowspan=1, sticky="nswe", padx=20, pady=20)
         self.stores_select_button.configure(state="disabled")
+
+
+
+
+
+
+
+
+        # Load Settings
+        self.protocol('WM_TAKE_FOCUS', self.load_settings())
 
 
     
@@ -230,6 +242,34 @@ class App(customtkinter.CTk):
 
     def start(self):
         self.mainloop()
+
+
+    def load_settings(self):
+        # Load settings from file
+        readconfig = configparser.ConfigParser()
+
+        if readconfig.read('config.ini') == []:
+            c_i = ''
+            c_s = ''
+            token_exp = ''
+            just_token = ''
+            storenumber = ''
+
+        else:
+            c_i = readconfig.get('auth','c_i')
+            c_s = readconfig.get('auth','c_s')  
+            token_exp = readconfig.get('token', 'token_exp')
+            just_token = readconfig.get('token', 'just_token')
+            storenumber = str(readconfig.get('location', 'location_id'))
+            self.credentials_id_entry.insert(END, c_i)
+            self.credentials_secret_entry.insert(END, c_s)
+            self.stores_optionmenu.set(storenumber)
+            self.stores_optionmenu.configure(values=[storenumber])
+            self.credentials_button.configure(text="Credentials Verified", fg_color="green", hover_color="green")
+    
+    
+
+
 
 
 if __name__ == "__main__":
