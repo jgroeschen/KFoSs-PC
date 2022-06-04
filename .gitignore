@@ -4,10 +4,10 @@ __pycache__/
 *$py.class
 
 # Settings files
-.ini
+*.ini
 
 # Databases
-.db
+*.db
 
 # C extensions
 *.so
