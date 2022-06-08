@@ -248,7 +248,7 @@ class App(customtkinter.CTk):
         # Load settings from file
         readconfig = configparser.ConfigParser()
 
-        if readconfig.read('config.ini') == []:
+        if readconfig.read('config.ini') == None:
             c_i = ''
             c_s = ''
             token_exp = ''
