@@ -189,6 +189,11 @@ class App(customtkinter.CTk):
         self.zip_entry = customtkinter.CTkEntry(master=self.settings_subframe_stores)
         self.zip_entry.grid(row=1, column=1, sticky="nswe", padx=20, pady=20)
 
+        self.chains_label = customtkinter.CTkLabel(master=self.settings_subframe_stores, text="Select chain:").grid(row=2, column=0, sticky="w", padx=20, pady=20)
+
+        self.chains_combobox = customtkinter.CTkComboBox(master=self.settings_subframe_stores,)
+        self.chains_combobox.grid(row=2, column=1, sticky="nswe", padx=20, pady=20)
+
         #self.stores_combobox = customtkinter.CTkComboBox(master=self.settings_subframe_stores)
         #self.stores_combobox.grid(row=2, column=0, columnspan=2, sticky="nswe", padx=20, pady=20)
 
@@ -198,7 +203,7 @@ class App(customtkinter.CTk):
         self.stores_optionmenu.configure(values=["option 1", "option 2", "option 3"]) #Temporary testing configuration for optionmenu
 
         self.stores_search_button = customtkinter.CTkButton(master=self.settings_subframe_stores, text="Find nearby stores", command=self.stores_search_button_event)
-        self.stores_search_button.grid(row=1, column=3, rowspan=1, sticky="nswe", padx=20, pady=20)
+        self.stores_search_button.grid(row=2, column=3, rowspan=1, sticky="nswe", padx=20, pady=20)
 
         self.stores_select_button = customtkinter.CTkButton(master=self.settings_subframe_stores, text="Select this store", command=self.stores_select_button_event)
         self.stores_select_button.grid(row=3, column=3, rowspan=1, sticky="nswe", padx=20, pady=20)
@@ -232,6 +237,11 @@ class App(customtkinter.CTk):
     
     def stores_search_button_event(self):
         print("Stores button pressed")
+        zip = self.zip_entry.get()
+        chain = self.chains_combobox.get()
+        limit = 5
+        stores_json = self.get_locations(zip, chain, limit)
+        print(stores_json)
         self.stores_select_button.configure(state=tkinter.NORMAL)
 
     def stores_select_button_event(self):
@@ -239,6 +249,7 @@ class App(customtkinter.CTk):
         self.price_check_button.configure(state=tkinter.NORMAL)
         self.historical_prices_button.configure(state=tkinter.NORMAL)
        
+
     def change_mode(self):
         if self.dark_mode_switch.get() == 1:
             customtkinter.set_appearance_mode("dark")
@@ -255,6 +266,7 @@ class App(customtkinter.CTk):
     def start(self):
         self.mainloop()
 
+
     def get_token(self):
         #Oauthlib client id, secret, and scope
         auth = HTTPBasicAuth(self.client_id, self.client_secret)
@@ -269,6 +281,31 @@ class App(customtkinter.CTk):
 
         #Grab espiration time from returned dict (30 min default)
         self.token_exp = full_token.get("expires_at")
+
+
+    def get_chains(self):
+        #Get chains
+        heads = {
+            "Accept": "application/json\\",
+        "Authorization": "Bearer "+ self.just_token,
+        }
+
+        return requests.get("https://api.kroger.com/v1/chains", headers=heads).json()
+
+
+    def get_locations(self, zip, chain, limit):
+        heads = {
+        "Accept": "application/json\\",
+        "Authorization": "Bearer "+ self.just_token,
+        }
+
+        paras = {
+        "filter.zipCode.near": zip,
+        "filter.chain": chain,
+        "filter.limit": limit,
+        }  
+
+        return requests.get("https://api.kroger.com/v1/locations", params=paras, headers=heads).json()
 
 
     def load_settings(self):
@@ -291,7 +328,7 @@ class App(customtkinter.CTk):
             self.store_number = str(readconfig.get('location', 'location_id'))
             self.store_name = str(readconfig.get('location', 'location_name'))
 
-        #Check if token is nearing expiration
+            #Check if token is nearing expiration
             if (float(self.token_exp) - time.time()) < 300:
                 #print(self.just_token)
                 #print(self.token_exp)
@@ -307,7 +344,15 @@ class App(customtkinter.CTk):
             self.stores_optionmenu.set(self.store_name)
             self.stores_optionmenu.configure(values=[self.store_number])
             self.credentials_button.configure(text="Credentials Verified", fg_color="green", hover_color="green")
-    
+
+            # Get list of chains and populate chains optionmenu
+            self.chains_combobox.set('')
+            chains_data = self.get_chains()
+            chains_list = []
+            for i in range(len(chains_data.get("data"))):
+                chains_list.append(chains_data.get("data")[i].get("name"))
+            self.chains_combobox.configure(values=chains_list)
+           
     
 
 
