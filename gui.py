@@ -3,6 +3,11 @@ import tkinter
 import tkinter.messagebox
 from tkinter import END
 import customtkinter
+from oauthlib.oauth2 import BackendApplicationClient
+from requests_oauthlib import OAuth2Session
+from requests.auth import HTTPBasicAuth
+import time
+import requests
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -11,6 +16,14 @@ customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "gre
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
+
+        #define variables for token/expiration, client id/secret, and store locations
+        self.just_token = ''
+        self.token_exp = ''
+        self.client_id = ''
+        self.client_secret = ''
+        self.store_name = ''
+        self.store_number = ''
 
 
         # Configure the window
@@ -219,7 +232,6 @@ class App(customtkinter.CTk):
     
     def stores_search_button_event(self):
         print("Stores button pressed")
-
         self.stores_select_button.configure(state=tkinter.NORMAL)
 
     def stores_select_button_event(self):
@@ -243,28 +255,57 @@ class App(customtkinter.CTk):
     def start(self):
         self.mainloop()
 
+    def get_token(self):
+        #Oauthlib client id, secret, and scope
+        auth = HTTPBasicAuth(self.client_id, self.client_secret)
+        client = BackendApplicationClient(client_id=self.client_id, scope='product.compact')
+        oauth = OAuth2Session(client=client, scope='product.compact')
+
+        #Fetch token
+        full_token = oauth.fetch_token(token_url='https://api.kroger.com/v1/connect/oauth2/token', auth=auth)
+
+        #Grab access token from returned dict
+        self.just_token = full_token.get("access_token")
+
+        #Grab espiration time from returned dict (30 min default)
+        self.token_exp = full_token.get("expires_at")
+
 
     def load_settings(self):
-        # Load settings from file
+        # Load settings from ini file
+        readconfig = None
         readconfig = configparser.ConfigParser()
 
-        if readconfig.read('config.ini') == None:
-            c_i = ''
-            c_s = ''
-            token_exp = ''
-            just_token = ''
-            storenumber = ''
+        if readconfig.read('config.ini') == []:
+            self.client_id = ''
+            self.client_secret = ''
+            self.token_exp = ''
+            self.just_token = ''
+            self.store_number = ''
 
         else:
-            c_i = readconfig.get('auth','c_i')
-            c_s = readconfig.get('auth','c_s')  
-            token_exp = readconfig.get('token', 'token_exp')
-            just_token = readconfig.get('token', 'just_token')
-            storenumber = str(readconfig.get('location', 'location_id'))
-            self.credentials_id_entry.insert(END, c_i)
-            self.credentials_secret_entry.insert(END, c_s)
-            self.stores_optionmenu.set(storenumber)
-            self.stores_optionmenu.configure(values=[storenumber])
+            self.client_id = readconfig.get('auth','c_i')
+            self.client_secret = readconfig.get('auth','c_s')  
+            self.token_exp = readconfig.get('token', 'token_exp')
+            self.just_token = readconfig.get('token', 'just_token')
+            self.store_number = str(readconfig.get('location', 'location_id'))
+            self.store_name = str(readconfig.get('location', 'location_name'))
+
+        #Check if token is nearing expiration
+            if (float(self.token_exp) - time.time()) < 300:
+                #print(self.just_token)
+                #print(self.token_exp)
+                self.get_token()
+                #print("Token refreshed")
+                #print(self.token_exp)
+            else:
+                #print("Token not refreshed")
+                pass
+
+            self.credentials_id_entry.insert(END, self.client_id)
+            self.credentials_secret_entry.insert(END, self.client_secret)
+            self.stores_optionmenu.set(self.store_name)
+            self.stores_optionmenu.configure(values=[self.store_number])
             self.credentials_button.configure(text="Credentials Verified", fg_color="green", hover_color="green")
     
     
