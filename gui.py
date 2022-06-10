@@ -184,23 +184,21 @@ class App(customtkinter.CTk):
                                               text_font=("Roboto Medium", -24))  
         self.stores_title.grid(row=0, column=0, columnspan=3, sticky="nswe", padx=20, pady=20)
 
-        self.zip_label = customtkinter.CTkLabel(master=self.settings_subframe_stores, text="Enter your ZIP:").grid(row=1, column=0, sticky="w", padx=20, pady=20)
+        self.zip_label = customtkinter.CTkLabel(master=self.settings_subframe_stores, text="Enter your ZIP:").grid(row=2, column=0, sticky="w", padx=20, pady=20)
 
         self.zip_entry = customtkinter.CTkEntry(master=self.settings_subframe_stores)
-        self.zip_entry.grid(row=1, column=1, sticky="nswe", padx=20, pady=20)
+        self.zip_entry.grid(row=2, column=1, sticky="nswe", padx=20, pady=20)
 
-        self.chains_label = customtkinter.CTkLabel(master=self.settings_subframe_stores, text="Select chain:").grid(row=2, column=0, sticky="w", padx=20, pady=20)
+        self.chains_label = customtkinter.CTkLabel(master=self.settings_subframe_stores, text="Select chain:").grid(row=1, column=0, sticky="w", padx=20, pady=20)
 
-        self.chains_combobox = customtkinter.CTkComboBox(master=self.settings_subframe_stores,)
-        self.chains_combobox.grid(row=2, column=1, sticky="nswe", padx=20, pady=20)
+        self.chains_optionmenu = customtkinter.CTkOptionMenu(master=self.settings_subframe_stores,)
+        self.chains_optionmenu.grid(row=1, column=1, sticky="nswe", padx=20, pady=20)
 
         #self.stores_combobox = customtkinter.CTkComboBox(master=self.settings_subframe_stores)
         #self.stores_combobox.grid(row=2, column=0, columnspan=2, sticky="nswe", padx=20, pady=20)
 
         self.stores_optionmenu = customtkinter.CTkOptionMenu(master=self.settings_subframe_stores,values=[''])
         self.stores_optionmenu.grid(row=3, column=0, columnspan=2, sticky="nswe", padx=20, pady=20)
-
-        self.stores_optionmenu.configure(values=["option 1", "option 2", "option 3"]) #Temporary testing configuration for optionmenu
 
         self.stores_search_button = customtkinter.CTkButton(master=self.settings_subframe_stores, text="Find nearby stores", command=self.stores_search_button_event)
         self.stores_search_button.grid(row=2, column=3, rowspan=1, sticky="nswe", padx=20, pady=20)
@@ -238,11 +236,16 @@ class App(customtkinter.CTk):
     def stores_search_button_event(self):
         print("Stores button pressed")
         zip = self.zip_entry.get()
-        chain = self.chains_combobox.get()
+        chain = self.chains_optionmenu.get()
         limit = 5
         stores_json = self.get_locations(zip, chain, limit)
         print(stores_json)
         self.stores_select_button.configure(state=tkinter.NORMAL)
+        stores_list = []
+        for i in range(len(stores_json.get("data"))):
+            stores_list.append(stores_json.get("data")[i].get("name"))
+        self.stores_optionmenu.configure(values=stores_list)
+
 
     def stores_select_button_event(self):
         print("Stores select button pressed")
@@ -281,6 +284,18 @@ class App(customtkinter.CTk):
 
         #Grab espiration time from returned dict (30 min default)
         self.token_exp = full_token.get("expires_at")
+
+    def is_token_expiring(self):
+        #Check if token is nearing expiration
+            if (float(self.token_exp) - time.time()) < 300:
+                #print(self.just_token)
+                #print(self.token_exp)
+                self.get_token()
+                #print("Token refreshed")
+                #print(self.token_exp)
+            else:
+                #print("Token not refreshed")
+                pass
 
 
     def get_chains(self):
@@ -323,35 +338,26 @@ class App(customtkinter.CTk):
         else:
             self.client_id = readconfig.get('auth','c_i')
             self.client_secret = readconfig.get('auth','c_s')  
-            self.token_exp = readconfig.get('token', 'token_exp')
-            self.just_token = readconfig.get('token', 'just_token')
+            #self.token_exp = readconfig.get('token', 'token_exp')
+            #self.just_token = readconfig.get('token', 'just_token')
             self.store_number = str(readconfig.get('location', 'location_id'))
             self.store_name = str(readconfig.get('location', 'location_name'))
 
-            #Check if token is nearing expiration
-            if (float(self.token_exp) - time.time()) < 300:
-                #print(self.just_token)
-                #print(self.token_exp)
-                self.get_token()
-                #print("Token refreshed")
-                #print(self.token_exp)
-            else:
-                #print("Token not refreshed")
-                pass
+            self.get_token()
 
             self.credentials_id_entry.insert(END, self.client_id)
             self.credentials_secret_entry.insert(END, self.client_secret)
-            self.stores_optionmenu.set(self.store_name)
-            self.stores_optionmenu.configure(values=[self.store_number])
+            #self.stores_optionmenu.set(self.store_name)
             self.credentials_button.configure(text="Credentials Verified", fg_color="green", hover_color="green")
 
             # Get list of chains and populate chains optionmenu
-            self.chains_combobox.set('')
+            self.chains_optionmenu.set('KROGER')
             chains_data = self.get_chains()
             chains_list = []
             for i in range(len(chains_data.get("data"))):
                 chains_list.append(chains_data.get("data")[i].get("name"))
-            self.chains_combobox.configure(values=chains_list)
+            chains_list = [e for e in chains_list if e not in ('AMOCO', 'BP', 'COPPS', 'COVID', 'EG GROUP', 'FRED', 'FRESH EATS MKT', 'HARRIS TEETER FUEL', 'HARRIS TEETER FUEL CENTER', 'HART', 'JEWELRY', 'KWIK', 'KWIK SHOP', 'LOAF', 'LOAF \'N JUG', 'OWENS', 'QUIK STOP','SHELL COMPANY', 'THE LITTLE CLINIC', 'TOM', 'TURKEY', 'TURKEY HILL', 'TURKEY HILL MINIT MARKETS', 'VITACOST')]
+            self.chains_optionmenu.configure(values=chains_list)
            
     
 
