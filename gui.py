@@ -242,8 +242,8 @@ class App(customtkinter.CTk):
         stores_list = []
         for i in range(len(stores_json.get("data"))):
             locid = str(stores_json.get("data")[i].get("locationId"))
-            locid = locid[locid.rfind('0', 3, 5)+1:] # Strip division number and leading zeros from location ID
-            stores_list.append(stores_json.get("data")[i].get("name") + " - Store #" + locid)
+            shortid = locid[locid.rfind('0', 3, 5)+1:] # Strip division number and leading zeros from location ID
+            stores_list.append(stores_json.get("data")[i].get("name") + " - Store #" + shortid + " (" + locid + ")")
         stores_list = [i for i in stores_list if "Pickup" not in i if "Walgreen" not in i if " Fuel " not in i] # Remove stores that are not retail stores
         del stores_list[10:] # Limit to 10 stores
         stores_list = [i[i.find(' - ')+3:] for i in stores_list] # Remove chain name from store name
@@ -252,9 +252,12 @@ class App(customtkinter.CTk):
 
 
     def stores_select_button_event(self):
-        print("Stores select button pressed")
+        self.store_selection = self.stores_optionmenu.get()
+        self.store_number = self.store_selection[self.store_selection.find('(')+1:self.store_selection.find(')')]
+        self.store_name = self.store_selection[:self.store_selection.find(' - Store')]
         self.price_check_button.configure(state=tkinter.NORMAL)
         self.historical_prices_button.configure(state=tkinter.NORMAL)
+        self.frame_prices.lift()
        
 
     def change_mode(self):
