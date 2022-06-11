@@ -237,14 +237,18 @@ class App(customtkinter.CTk):
         print("Stores button pressed")
         zip = self.zip_entry.get()
         chain = self.chains_optionmenu.get()
-        limit = 5
-        stores_json = self.get_locations(zip, chain, limit)
-        print(stores_json)
-        self.stores_select_button.configure(state=tkinter.NORMAL)
+        limit = 35
+        stores_json = self.get_locations(zip, chain, limit)        
         stores_list = []
         for i in range(len(stores_json.get("data"))):
-            stores_list.append(stores_json.get("data")[i].get("name"))
+            locid = str(stores_json.get("data")[i].get("locationId"))
+            locid = locid[locid.rfind('0', 3, 5)+1:] # Strip division number and leading zeros from location ID
+            stores_list.append(stores_json.get("data")[i].get("name") + " - Store #" + locid)
+        stores_list = [i for i in stores_list if "Pickup" not in i if "Walgreen" not in i if " Fuel " not in i] # Remove stores that are not retail stores
+        del stores_list[10:] # Limit to 10 stores
+        stores_list = [i[i.find(' - ')+3:] for i in stores_list] # Remove chain name from store name
         self.stores_optionmenu.configure(values=stores_list)
+        self.stores_select_button.configure(state=tkinter.NORMAL)
 
 
     def stores_select_button_event(self):
@@ -318,6 +322,7 @@ class App(customtkinter.CTk):
         "filter.zipCode.near": zip,
         "filter.chain": chain,
         "filter.limit": limit,
+        "filter.radiusInMiles": 25,
         }  
 
         return requests.get("https://api.kroger.com/v1/locations", params=paras, headers=heads).json()
