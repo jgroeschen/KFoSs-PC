@@ -77,7 +77,7 @@ class App(customtkinter.CTk):
                                                 text="Price Checker",
                                                 text_font=("Roboto", -18),
                                                 fg_color=("gray70", "gray30"),
-                                                command=self.button_event)
+                                                command=self.prices_button_event)
         self.price_check_button.grid(row=3, pady=10, padx=10, ipadx=10, ipady=5, sticky="we")
         self.price_check_button.configure(state=tkinter.DISABLED)
 
@@ -85,7 +85,7 @@ class App(customtkinter.CTk):
                                                 text="Historical Prices",
                                                 text_font=("Roboto", -18),
                                                 fg_color=("gray70", "gray30"),
-                                                command=self.button_event)
+                                                command=self.historical_button_event)
         self.historical_prices_button.grid(row=4, pady=10, padx=10, ipadx=10, ipady=5, sticky="we")
         self.historical_prices_button.configure(state=tkinter.DISABLED)
 
@@ -104,14 +104,27 @@ class App(customtkinter.CTk):
 
 
         # Create and arrange frame_prices
-        self.frame_prices.rowconfigure((0, 1, 2, 3), weight=1)
-        self.frame_prices.rowconfigure(7, weight=10)
-        self.frame_prices.columnconfigure((0, 1), weight=1)
-        self.frame_prices.columnconfigure(2, weight=0)
+        self.frame_prices.rowconfigure(0, weight=0)
+        self.frame_prices.rowconfigure(1, weight=10)
+        self.frame_prices.columnconfigure((0, 1, 2, 3, 4, 5, 6), weight=1)
+        #self.frame_prices.columnconfigure(2, weight=0)
 
-        self.frame_info = customtkinter.CTkFrame(master=self.frame_prices)
-        self.frame_info.grid(row=0, column=0, columnspan=2, rowspan=4, pady=20, padx=20, sticky="nsew")
+        self.product_search_bar = customtkinter.CTkEntry(master=self.frame_prices,)
+        self.product_search_bar.grid(row=0, column=0, columnspan=6, sticky="nswe", padx=10, pady=10)
 
+        self.product_search_location = customtkinter.CTkOptionMenu(master=self.frame_prices,)
+        self.product_search_location.grid(row=0, column=6, sticky="nswe", padx=10, pady=10)
+
+        self.product_search_button = customtkinter.CTkButton(master=self.frame_prices, text="Search", command=self.product_search_button_event)
+        self.product_search_button.grid(row=0, column=7, sticky="nswe", padx=10, pady=10)
+
+        self.subframe_product_list = customtkinter.CTkFrame(master=self.frame_prices)
+        self.subframe_product_list.grid(row=1, column=0, columnspan=4, sticky="nswe", padx=10, pady=10)
+
+        self.subframe_product_info = customtkinter.CTkFrame(master=self.frame_prices)
+        self.subframe_product_info.grid(row=1, column=4, columnspan=4, pady=10, padx=10, sticky="nsew")
+
+        '''
         #Very Temporary
         rows = []
 
@@ -131,7 +144,7 @@ class App(customtkinter.CTk):
                 cols.append(e)
 
             rows.append(cols)
-
+        '''
 
         # Create and arrange frame_historical_prices
 
@@ -222,17 +235,47 @@ class App(customtkinter.CTk):
 
 
 
-
-    def button_event(self):
-        print("Button pressed")
-        
-        
-        self.frame_prices.lift()
-
-    def settings_button_event(self):
-        print("Settings button pressed")
-        self.frame_settings.lift()
     
+    # Token functions
+    def get_token(self):
+        #Oauthlib client id, secret, and scope
+        auth = HTTPBasicAuth(self.client_id, self.client_secret)
+        client = BackendApplicationClient(client_id=self.client_id, scope='product.compact')
+        oauth = OAuth2Session(client=client, scope='product.compact')
+        full_token = oauth.fetch_token(token_url='https://api.kroger.com/v1/connect/oauth2/token', auth=auth) # Fetch token
+        self.just_token = full_token.get("access_token") # Grab access token from returned dict
+        self.token_exp = full_token.get("expires_at") # Grab espiration time from returned dict (30 min default)
+
+    def is_token_expiring(self):
+        if (float(self.token_exp) - time.time()) < 300: # Check if token is nearing expiration
+            self.get_token()
+        else:
+            pass
+
+
+    # API functions
+    def get_chains(self):
+        heads = {
+            "Accept": "application/json\\",
+        "Authorization": "Bearer "+ self.just_token,
+        }
+        return requests.get("https://api.kroger.com/v1/chains", headers=heads).json()
+
+    def get_locations(self, zip, chain, limit):
+        heads = {
+        "Accept": "application/json\\",
+        "Authorization": "Bearer "+ self.just_token,
+        }
+        paras = {
+        "filter.zipCode.near": zip,
+        "filter.chain": chain,
+        "filter.limit": limit,
+        "filter.radiusInMiles": 25,
+        }  
+        return requests.get("https://api.kroger.com/v1/locations", params=paras, headers=heads).json()
+
+
+    # Store search/select buttons functions
     def stores_search_button_event(self):
         print("Stores button pressed")
         zip = self.zip_entry.get()
@@ -244,12 +287,12 @@ class App(customtkinter.CTk):
             locid = str(stores_json.get("data")[i].get("locationId"))
             shortid = locid[locid.rfind('0', 3, 5)+1:] # Strip division number and leading zeros from location ID
             stores_list.append(stores_json.get("data")[i].get("name") + " - Store #" + shortid + " (" + locid + ")")
-        stores_list = [i for i in stores_list if "Pickup" not in i if "Walgreen" not in i if " Fuel " not in i] # Remove stores that are not retail stores
+        stores_list = [i for i in stores_list if "Pickup" not in i if "Walgreen" not in i if " Fuel " not in i if "Warehouse" not in i] # Remove stores that are not retail stores
         del stores_list[10:] # Limit to 10 stores
         stores_list = [i[i.find(' - ')+3:] for i in stores_list] # Remove chain name from store name
         self.stores_optionmenu.configure(values=stores_list)
+        self.product_search_location.configure(values=stores_list)
         self.stores_select_button.configure(state=tkinter.NORMAL)
-
 
     def stores_select_button_event(self):
         self.store_selection = self.stores_optionmenu.get()
@@ -257,9 +300,16 @@ class App(customtkinter.CTk):
         self.store_name = self.store_selection[:self.store_selection.find(' - Store')]
         self.price_check_button.configure(state=tkinter.NORMAL)
         self.historical_prices_button.configure(state=tkinter.NORMAL)
+        self.product_search_location.set(self.store_selection)
         self.frame_prices.lift()
+
+    
+    # Price check functions
+    def product_search_button_event(self):
+        print("Product search button pressed")
        
 
+    # Application functions
     def change_mode(self):
         if self.dark_mode_switch.get() == 1:
             customtkinter.set_appearance_mode("dark")
@@ -277,62 +327,23 @@ class App(customtkinter.CTk):
         self.mainloop()
 
 
-    def get_token(self):
-        #Oauthlib client id, secret, and scope
-        auth = HTTPBasicAuth(self.client_id, self.client_secret)
-        client = BackendApplicationClient(client_id=self.client_id, scope='product.compact')
-        oauth = OAuth2Session(client=client, scope='product.compact')
+    # Navigation button functions
+    def prices_button_event(self):
+        print("Prices button pressed")
+        self.frame_prices.lift()
 
-        #Fetch token
-        full_token = oauth.fetch_token(token_url='https://api.kroger.com/v1/connect/oauth2/token', auth=auth)
+    def historical_button_event(self):
+        print("Historical button pressed")
+        self.frame_historical_prices.lift()
 
-        #Grab access token from returned dict
-        self.just_token = full_token.get("access_token")
+    def settings_button_event(self):
+        print("Settings button pressed")
+        self.frame_settings.lift()
+    
 
-        #Grab espiration time from returned dict (30 min default)
-        self.token_exp = full_token.get("expires_at")
-
-    def is_token_expiring(self):
-        #Check if token is nearing expiration
-            if (float(self.token_exp) - time.time()) < 300:
-                #print(self.just_token)
-                #print(self.token_exp)
-                self.get_token()
-                #print("Token refreshed")
-                #print(self.token_exp)
-            else:
-                #print("Token not refreshed")
-                pass
-
-
-    def get_chains(self):
-        #Get chains
-        heads = {
-            "Accept": "application/json\\",
-        "Authorization": "Bearer "+ self.just_token,
-        }
-
-        return requests.get("https://api.kroger.com/v1/chains", headers=heads).json()
-
-
-    def get_locations(self, zip, chain, limit):
-        heads = {
-        "Accept": "application/json\\",
-        "Authorization": "Bearer "+ self.just_token,
-        }
-
-        paras = {
-        "filter.zipCode.near": zip,
-        "filter.chain": chain,
-        "filter.limit": limit,
-        "filter.radiusInMiles": 25,
-        }  
-
-        return requests.get("https://api.kroger.com/v1/locations", params=paras, headers=heads).json()
-
-
+    # Settings loader
     def load_settings(self):
-        # Load settings from ini file
+        # Load settings from ini file and the API
         readconfig = None
         readconfig = configparser.ConfigParser()
 
