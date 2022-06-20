@@ -1,13 +1,14 @@
 import configparser
+import time
 import tkinter
 import tkinter.messagebox
 from tkinter import END
+
 import customtkinter
 from oauthlib.oauth2 import BackendApplicationClient
-from requests_oauthlib import OAuth2Session
-from requests.auth import HTTPBasicAuth
-import time
 import requests
+from requests.auth import HTTPBasicAuth
+from requests_oauthlib import OAuth2Session
 
 # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_appearance_mode("System")
@@ -237,7 +238,7 @@ class App(customtkinter.CTk):
                 row=1, column=0, sticky="w", padx=20, pady=20)
 
         self.chains_optionmenu = customtkinter.CTkOptionMenu(
-            master=self.settings_subframe_stores,)
+            master=self.settings_subframe_stores, values=[''])
         self.chains_optionmenu.grid(row=1, column=1, sticky="nswe",
                                     padx=20, pady=20)
 
@@ -287,8 +288,19 @@ class App(customtkinter.CTk):
             "Accept": "application/json\\",
             "Authorization": "Bearer " + self.just_token,
         }
-        return requests.get("https://api.kroger.com/v1/chains",
-                            headers=heads).json()
+        chains_data = requests.get("https://api.kroger.com/v1/chains",
+                                   headers=heads).json()
+        chains_list = []
+        for i in range(len(chains_data.get("data"))):
+            chains_list.append(chains_data.get("data")[i].get("name"))
+        chains_list = [e for e in chains_list if e not in (
+            'AMOCO', 'BP', 'COPPS', 'COVID', 'EG GROUP', 'FRED',
+            'FRESH EATS MKT', 'HARRIS TEETER FUEL',
+            'HARRIS TEETER FUEL CENTER', 'HART', 'JEWELRY', 'KWIK',
+            'KWIK SHOP', 'LOAF', 'LOAF \'N JUG', 'OWENS', 'QUIK STOP',
+            'SHELL COMPANY', 'THE LITTLE CLINIC', 'TOM', 'TURKEY',
+            'TURKEY HILL', 'TURKEY HILL MINIT MARKETS', 'VITACOST')]
+        return chains_list
 
     def get_locations(self, zip, chain, limit):
         heads = {
@@ -407,17 +419,7 @@ class App(customtkinter.CTk):
 
             # Get list of chains and populate chains optionmenu
             self.chains_optionmenu.set('KROGER')
-            chains_data = self.get_chains()
-            chains_list = []
-            for i in range(len(chains_data.get("data"))):
-                chains_list.append(chains_data.get("data")[i].get("name"))
-            chains_list = [e for e in chains_list if e not in (
-                'AMOCO', 'BP', 'COPPS', 'COVID', 'EG GROUP', 'FRED',
-                'FRESH EATS MKT', 'HARRIS TEETER FUEL',
-                'HARRIS TEETER FUEL CENTER', 'HART', 'JEWELRY', 'KWIK',
-                'KWIK SHOP', 'LOAF', 'LOAF \'N JUG', 'OWENS', 'QUIK STOP',
-                'SHELL COMPANY', 'THE LITTLE CLINIC', 'TOM', 'TURKEY',
-                'TURKEY HILL', 'TURKEY HILL MINIT MARKETS', 'VITACOST')]
+            chains_list = self.get_chains()
             self.chains_optionmenu.configure(values=chains_list)
 
 
