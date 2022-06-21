@@ -209,7 +209,8 @@ class App(customtkinter.CTk):
 
         self.credentials_button = customtkinter.CTkButton(
             master=self.settings_subframe_credentials,
-            text="Check your credentials",)
+            text="Check your credentials",
+            command=self.credentials_button_event)
         self.credentials_button.grid(row=1, column=3, rowspan=3, sticky="nswe",
                                      padx=20, pady=20)
 
@@ -315,6 +316,18 @@ class App(customtkinter.CTk):
         }
         return requests.get("https://api.kroger.com/v1/locations",
                             params=paras, headers=heads).json()
+
+    # Credentials functions
+    def credentials_button_event(self):
+        self.client_id = self.credentials_id_entry.get()
+        self.client_secret = self.credentials_secret_entry.get()
+        self.get_token()
+        self.credentials_button.configure(
+                text="Credentials Verified",
+                fg_color="green", hover_color="green")
+        self.chains_optionmenu.set('KROGER')
+        chains_list = self.get_chains()
+        self.chains_optionmenu.configure(values=chains_list)
 
     # Store search/select buttons functions
     def stores_search_button_event(self):
