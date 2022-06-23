@@ -27,6 +27,7 @@ class App(customtkinter.CTk):
         self.client_secret = ''
         self.store_name = ''
         self.store_number = ''
+        self.zip = ''
 
         # Configure the window
         self.title("KFoSs-PC -- The Kroger Family of Stores Price Checker")
@@ -109,7 +110,7 @@ class App(customtkinter.CTk):
         # Create and arrange frame_prices
         self.frame_prices.rowconfigure(0, weight=0)
         self.frame_prices.rowconfigure(1, weight=10)
-        self.frame_prices.columnconfigure((0, 1, 2, 3, 4, 5, 6), weight=1)
+        self.frame_prices.columnconfigure((0, 1, 2, 3, 4, 5, 6, 7), weight=1)
         # self.frame_prices.columnconfigure(2, weight=0)
 
         self.product_search_bar = customtkinter.CTkEntry(
@@ -118,7 +119,7 @@ class App(customtkinter.CTk):
                                      sticky="nswe", padx=10, pady=10)
 
         self.product_search_location = customtkinter.CTkOptionMenu(
-            master=self.frame_prices,)
+            master=self.frame_prices, width=400)
         self.product_search_location.grid(row=0, column=6, sticky="nswe",
                                           padx=10, pady=10)
 
@@ -130,12 +131,12 @@ class App(customtkinter.CTk):
 
         self.subframe_product_list = customtkinter.CTkFrame(
             master=self.frame_prices)
-        self.subframe_product_list.grid(row=1, column=0, columnspan=4,
+        self.subframe_product_list.grid(row=1, column=0, columnspan=5,
                                         sticky="nswe", padx=10, pady=10)
 
         self.subframe_product_info = customtkinter.CTkFrame(
             master=self.frame_prices)
-        self.subframe_product_info.grid(row=1, column=4, columnspan=4,
+        self.subframe_product_info.grid(row=1, column=5, columnspan=3,
                                         pady=10, padx=10, sticky="nsew")
 
         '''
@@ -244,7 +245,7 @@ class App(customtkinter.CTk):
                                     padx=20, pady=20)
 
         self.stores_optionmenu = customtkinter.CTkOptionMenu(
-            master=self.settings_subframe_stores, values=[''])
+            master=self.settings_subframe_stores, values=[''], width=400)
         self.stores_optionmenu.grid(row=3, column=0, columnspan=2,
                                     sticky="nswe", padx=20, pady=20)
 
@@ -276,6 +277,8 @@ class App(customtkinter.CTk):
             auth=auth)
         self.just_token = full_token.get("access_token")
         self.token_exp = full_token.get("expires_at")
+        self.write_config('token', 'just_token', str(self.just_token))
+        self.write_config('token', 'token_exp', str(self.token_exp))
 
     def is_token_expiring(self):
         if (float(self.token_exp) - time.time()) < 300:
@@ -289,6 +292,7 @@ class App(customtkinter.CTk):
             "Accept": "application/json\\",
             "Authorization": "Bearer " + self.just_token,
         }
+        self.is_token_expiring()
         chains_data = requests.get("https://api.kroger.com/v1/chains",
                                    headers=heads).json()
         chains_list = []
@@ -301,6 +305,7 @@ class App(customtkinter.CTk):
             'KWIK SHOP', 'LOAF', 'LOAF \'N JUG', 'OWENS', 'QUIK STOP',
             'SHELL COMPANY', 'THE LITTLE CLINIC', 'TOM', 'TURKEY',
             'TURKEY HILL', 'TURKEY HILL MINIT MARKETS', 'VITACOST')]
+        self.write_config('chains', 'chain_list', str(chains_list))
         return chains_list
 
     def get_locations(self, zip, chain, limit):
@@ -314,6 +319,7 @@ class App(customtkinter.CTk):
             "filter.limit": limit,
             "filter.radiusInMiles": 25,
         }
+        self.is_token_expiring()
         return requests.get("https://api.kroger.com/v1/locations",
                             params=paras, headers=heads).json()
 
@@ -321,6 +327,8 @@ class App(customtkinter.CTk):
     def credentials_button_event(self):
         self.client_id = self.credentials_id_entry.get()
         self.client_secret = self.credentials_secret_entry.get()
+        self.write_config('auth', 'c_i', str(self.client_id))
+        self.write_config('auth', 'c_s', str(self.client_secret))
         self.get_token()
         self.credentials_button.configure(
                 text="Credentials Verified",
@@ -331,7 +339,7 @@ class App(customtkinter.CTk):
 
     # Store search/select buttons functions
     def stores_search_button_event(self):
-        print("Stores button pressed")
+        self.is_token_expiring()
         zip = self.zip_entry.get()
         chain = self.chains_optionmenu.get()
         limit = 35
@@ -350,7 +358,10 @@ class App(customtkinter.CTk):
         del stores_list[10:]  # Limit to 10 stores
         # Remove chain name from store name
         stores_list = [i[i.find(' - ')+3:] for i in stores_list]
+        self.write_config('alternates', 'location_list', str(stores_list, ))
+        self.write_config('location', 'user_zip', zip)
         self.stores_optionmenu.configure(values=stores_list)
+        self.stores_optionmenu.set(stores_list[0])
         self.product_search_location.configure(values=stores_list)
         self.stores_select_button.configure(state=tkinter.NORMAL)
 
@@ -361,13 +372,17 @@ class App(customtkinter.CTk):
             + 1:self.store_selection.find(')')]
         self.store_name = self.store_selection[
             :self.store_selection.find(' - Store')]
+        self.write_config('location', 'location_id', self.store_number)
+        self.write_config('location', 'location_name', self.store_name)
         self.price_check_button.configure(state=tkinter.NORMAL)
         self.historical_prices_button.configure(state=tkinter.NORMAL)
         self.product_search_location.set(self.store_selection)
+        # self.product_search_location.configure(width=500)
         self.frame_prices.lift()
 
     # Price check functions
     def product_search_button_event(self):
+        self.is_token_expiring()
         print("Product search button pressed")
 
     # Application functions
@@ -387,17 +402,35 @@ class App(customtkinter.CTk):
     def start(self):
         self.mainloop()
 
+    def write_config(self, section, key, value):
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+        if config.has_section(section):
+            pass
+        else:
+            config.add_section(section)
+        config.set(section, key, value)
+        with open('config.ini', 'w') as configfile:
+            config.write(configfile)
+    
+    def read_list(self, section, key):
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+        list = config.get(section, key)
+        list = list[1:-1]
+        list = list.split(',')
+        list = [e.strip() for e in list]
+        list = [e[1:-1] for e in list]
+        return list
+
     # Navigation button functions
     def prices_button_event(self):
-        print("Prices button pressed")
         self.frame_prices.lift()
 
     def historical_button_event(self):
-        print("Historical button pressed")
         self.frame_historical_prices.lift()
 
     def settings_button_event(self):
-        print("Settings button pressed")
         self.frame_settings.lift()
 
     # Settings loader
@@ -407,33 +440,42 @@ class App(customtkinter.CTk):
         readconfig = configparser.ConfigParser()
 
         if readconfig.read('config.ini') == []:
-            self.client_id = ''
-            self.client_secret = ''
-            self.token_exp = ''
-            self.just_token = ''
-            self.store_number = ''
+            pass
 
         else:
+            # read values
             self.client_id = readconfig.get('auth', 'c_i')
             self.client_secret = readconfig.get('auth', 'c_s')
             self.token_exp = readconfig.get('token', 'token_exp')
             self.just_token = readconfig.get('token', 'just_token')
             self.store_number = str(readconfig.get('location', 'location_id'))
             self.store_name = str(readconfig.get('location', 'location_name'))
-            print(self.just_token)
-            self.get_token()
+            self.zip = str(readconfig.get('location', 'user_zip'))
+            self.stores_list = self.read_list('alternates', 'location_list')
 
+            # set values to settings frame
             self.credentials_id_entry.insert(END, self.client_id)
             self.credentials_secret_entry.insert(END, self.client_secret)
+            self.zip_entry.insert(END, self.zip)
+            self.stores_optionmenu.configure(values=self.stores_list)
+            self.stores_optionmenu.set(self.store_name)
             # self.stores_optionmenu.set(self.store_name)
+
+            self.is_token_expiring()
+
             self.credentials_button.configure(
                 text="Credentials Verified",
                 fg_color="green", hover_color="green")
 
             # Get list of chains and populate chains optionmenu
             self.chains_optionmenu.set('KROGER')
-            chains_list = self.get_chains()
+            chains_list = self.read_list('chains', 'chain_list')
             self.chains_optionmenu.configure(values=chains_list)
+
+            self.stores_select_button.configure(state=tkinter.NORMAL)
+            self.price_check_button.configure(state=tkinter.NORMAL)
+            self.historical_prices_button.configure(state=tkinter.NORMAL)
+            self.frame_prices.lift()
 
 
 if __name__ == "__main__":
