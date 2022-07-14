@@ -9,6 +9,7 @@ from oauthlib.oauth2 import BackendApplicationClient
 import requests
 from requests.auth import HTTPBasicAuth
 from requests_oauthlib import OAuth2Session
+import pint
 
 # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_appearance_mode("System")
@@ -28,6 +29,10 @@ class App(customtkinter.CTk):
         self.store_name = ''
         self.store_number = ''
         self.zip = ''
+        
+        # define ureg for pint
+        self.ureg = pint.UnitRegistry()
+        self.ureg.default_system = 'imperial'
 
         # Configure the window
         self.title("KFoSs-PC -- The Kroger Family of Stores Price Checker")
@@ -110,18 +115,19 @@ class App(customtkinter.CTk):
         # Create and arrange frame_prices
         self.frame_prices.rowconfigure(0, weight=0)
         self.frame_prices.rowconfigure(1, weight=10)
-        self.frame_prices.columnconfigure((0, 1, 2, 3, 4, 5, 6, 7), weight=1)
+        self.frame_prices.columnconfigure((0, 1, 2, 3, 4, 5, 6, 7),
+                                          weight=1, uniform='x')
         # self.frame_prices.columnconfigure(2, weight=0)
 
         self.product_search_bar = customtkinter.CTkEntry(
             master=self.frame_prices)
-        self.product_search_bar.grid(row=0, column=0, columnspan=6,
+        self.product_search_bar.grid(row=0, column=0, columnspan=5,
                                      sticky="nswe", padx=10, pady=10)
 
         self.product_search_location = customtkinter.CTkOptionMenu(
-            master=self.frame_prices, width=400)
-        self.product_search_location.grid(row=0, column=6, sticky="nswe",
-                                          padx=10, pady=10)
+            master=self.frame_prices, width=400,)
+        self.product_search_location.grid(row=0, column=5, columnspan=2,
+                                          sticky="nswe", padx=10, pady=10)
 
         self.product_search_button = customtkinter.CTkButton(
             master=self.frame_prices, text="Search",
@@ -131,35 +137,15 @@ class App(customtkinter.CTk):
 
         self.subframe_product_list = customtkinter.CTkFrame(
             master=self.frame_prices)
-        self.subframe_product_list.grid(row=1, column=0, columnspan=5,
+        self.subframe_product_list.grid(row=1, column=0, columnspan=4,
                                         sticky="nswe", padx=10, pady=10)
+        self.subframe_product_list.columnconfigure((0, 1,),
+                                                   weight=1, uniform='x')
 
         self.subframe_product_info = customtkinter.CTkFrame(
             master=self.frame_prices)
-        self.subframe_product_info.grid(row=1, column=5, columnspan=3,
+        self.subframe_product_info.grid(row=1, column=4, columnspan=4,
                                         pady=10, padx=10, sticky="nsew")
-
-        '''
-        #Very Temporary
-        rows = []
-
-        for i in range(6):
-
-            cols = []
-
-            for j in range(8):
-
-                e = customtkinter.CTkEntry(master=self.frame_info)
-
-                e.grid(row=i, column=j, sticky='NSEW')
-
-                e.insert(END, 'row %d, column %d' % (i, j))
-                e.configure(state='disabled')
-
-                cols.append(e)
-
-            rows.append(cols)
-        '''
 
         # Create and arrange frame_historical_prices
 
@@ -323,6 +309,19 @@ class App(customtkinter.CTk):
         return requests.get("https://api.kroger.com/v1/locations",
                             params=paras, headers=heads).json()
 
+    def get_products(self, searchterm, limit, locID):
+        heads = {
+            "Accept": "application/json\\",
+            "Authorization": "Bearer " + self.just_token,
+        }
+        params = {
+            "filter.term": searchterm,
+            "filter.limit": limit,
+            "filter.locationId": locID,
+        }
+        return requests.get("https://api.kroger.com/v1/products",
+                            params=params, headers=heads).json()
+
     # Credentials functions
     def credentials_button_event(self):
         self.client_id = self.credentials_id_entry.get()
@@ -383,7 +382,76 @@ class App(customtkinter.CTk):
     # Price check functions
     def product_search_button_event(self):
         self.is_token_expiring()
-        print("Product search button pressed")
+        self.store_selection = self.stores_optionmenu.get()
+        self.store_number = self.store_selection[
+            self.store_selection.find('(')
+            + 1:self.store_selection.find(')')]
+        self.product_search_term = self.product_search_bar.get()
+        products = self.get_products(self.product_search_term, 20,
+                                     self.store_number)
+        # display products
+        for i in range(len(products.get('data'))):
+            upc = products.get("data")[i].get('upc')
+            description = products.get("data")[i].get('description')
+            brand = products.get("data")[i].get('brand')
+            size = products.get("data")[i].get('items')[0].get('size')
+            useless_units = ('/', 'pk', 'ct', 'pc', ' c')
+            if any(term in size for term in useless_units):
+                parseable_size = ''
+            else:
+                parseable_size = size
+            parseable_size = parseable_size.replace('fl oz', 'floz')
+            if 'lb' in size and 'oz' in size:
+                pattern = '{lb} lb {oz} oz'
+                lb_oz = self.ureg.parse_pattern(size, pattern)
+                if lb_oz == []:
+                    parseable_size = ''
+                else:
+                    parseable_size = (lb_oz[0].to(
+                        self.ureg.sys.imperial.oz) + lb_oz[1])
+                    parseable_size = round(parseable_size, 3)
+                    parseable_size = str(parseable_size)
+            else:
+                pass
+            sold_by = products.get("data")[i].get('items')[0].get('soldBy')
+            try:
+                reg_price = products.get("data")[i].get('items')[0].get(
+                    'price').get('regular')
+            except Exception as error:
+                reg_price = 0
+                print(error)
+            try:
+                promo_price = products.get("data")[i].get('items')[0].get(
+                    'price').get('promo')
+            except Exception as error:
+                promo_price = 0
+                print(error)
+            if promo_price == 0:
+                promo_price = reg_price
+            percent = 0 if reg_price == 0 else int(
+                (1 - (promo_price / reg_price)) * 100)
+            try:
+                unit_parse = self.ureg(parseable_size).units
+                magnitude_parse = self.ureg(parseable_size).magnitude
+                if unit_parse.dimensionless:
+                    unit_parse = ''
+                    magnitude_parse = ''
+            except Exception as error:
+                unit_parse = ''
+                magnitude_parse = ''
+                print(error)
+            button_text = ''.join(description + " - "
+                                  + size + " - "
+                                  + str("${:,.2f}".format(promo_price)))
+            self.product_button = customtkinter.CTkButton(
+                master=self.subframe_product_list,
+                text=button_text,
+                command=lambda upc=upc: self.product_button_event(upc))
+            self.product_button.grid(row=i, column=0, columnspan=2,
+                                     sticky="nswe", padx=10, pady=5)
+
+    def product_button_event(self, upc):
+        print(upc)
 
     # Application functions
     def change_mode(self):
@@ -412,7 +480,7 @@ class App(customtkinter.CTk):
         config.set(section, key, value)
         with open('config.ini', 'w') as configfile:
             config.write(configfile)
-    
+
     def read_list(self, section, key):
         config = configparser.ConfigParser()
         config.read('config.ini')
