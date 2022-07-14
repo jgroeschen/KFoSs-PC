@@ -318,6 +318,7 @@ class App(customtkinter.CTk):
             "filter.term": searchterm,
             "filter.limit": limit,
             "filter.locationId": locID,
+            "filter.fulfillment": "ais",
         }
         return requests.get("https://api.kroger.com/v1/products",
                             params=params, headers=heads).json()
