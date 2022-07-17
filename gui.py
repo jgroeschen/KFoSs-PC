@@ -29,7 +29,7 @@ class App(customtkinter.CTk):
         self.store_name = ''
         self.store_number = ''
         self.zip = ''
-        
+
         # define ureg for pint
         self.ureg = pint.UnitRegistry()
         self.ureg.default_system = 'imperial'
@@ -120,9 +120,11 @@ class App(customtkinter.CTk):
         # self.frame_prices.columnconfigure(2, weight=0)
 
         self.product_search_bar = customtkinter.CTkEntry(
-            master=self.frame_prices)
+            master=self.frame_prices, )
         self.product_search_bar.grid(row=0, column=0, columnspan=5,
                                      sticky="nswe", padx=10, pady=10)
+        self.product_search_bar.bind('<Return>',
+                                     self.product_search_button_event)
 
         self.product_search_location = customtkinter.CTkOptionMenu(
             master=self.frame_prices, width=400,)
@@ -381,7 +383,7 @@ class App(customtkinter.CTk):
         self.frame_prices.lift()
 
     # Price check functions
-    def product_search_button_event(self):
+    def product_search_button_event(self, event=None):
         self.is_token_expiring()
         self.store_selection = self.stores_optionmenu.get()
         self.store_number = self.store_selection[
@@ -391,6 +393,8 @@ class App(customtkinter.CTk):
         products = self.get_products(self.product_search_term, 20,
                                      self.store_number)
         # display products
+        for widget in self.subframe_product_list.winfo_children():
+            widget.destroy()
         for i in range(len(products.get('data'))):
             upc = products.get("data")[i].get('upc')
             description = products.get("data")[i].get('description')
@@ -441,18 +445,19 @@ class App(customtkinter.CTk):
                 unit_parse = ''
                 magnitude_parse = ''
                 print(error)
+            data = [upc, description]
             button_text = ''.join(description + " - "
                                   + size + " - "
                                   + str("${:,.2f}".format(promo_price)))
             self.product_button = customtkinter.CTkButton(
                 master=self.subframe_product_list,
                 text=button_text,
-                command=lambda upc=upc: self.product_button_event(upc))
+                command=lambda data=data: self.product_button_event(data))
             self.product_button.grid(row=i, column=0, columnspan=2,
                                      sticky="nswe", padx=10, pady=5)
 
-    def product_button_event(self, upc):
-        print(upc)
+    def product_button_event(self, data):
+        print(data[1], data[0])
 
     # Application functions
     def change_mode(self):
