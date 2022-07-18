@@ -420,6 +420,18 @@ class App(customtkinter.CTk):
                     parseable_size = str(parseable_size)
             else:
                 pass
+            if parseable_size == '':
+                pass
+            else:
+                parseable_size = self.ureg(parseable_size).to_base_units()
+                try:
+                    parseable_size = parseable_size.to('fluid_ounce')
+                except Exception as error:
+                    print("Error: Not a fluid, apparently")
+                try:
+                    parseable_size = parseable_size.to('ounce')
+                except Exception as error:
+                    print("Error: Not a solid, either?")
             sold_by = products.get("data")[i].get('items')[0].get('soldBy')
             try:
                 reg_price = products.get("data")[i].get('items')[0].get(
@@ -438,8 +450,8 @@ class App(customtkinter.CTk):
             percent = 0 if reg_price == 0 else int(
                 (1 - (promo_price / reg_price)) * 100)
             try:
-                unit_parse = self.ureg(parseable_size).units
-                magnitude_parse = self.ureg(parseable_size).magnitude
+                unit_parse = parseable_size.units
+                magnitude_parse = parseable_size.magnitude
                 if unit_parse.dimensionless:
                     unit_parse = ''
                     magnitude_parse = ''
