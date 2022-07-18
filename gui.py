@@ -402,7 +402,7 @@ class App(customtkinter.CTk):
             description = products.get("data")[i].get('description')
             brand = products.get("data")[i].get('brand')
             size = products.get("data")[i].get('items')[0].get('size')
-            useless_units = ('/', 'pk', 'ct', 'pc', ' c')
+            useless_units = (' / ', 'pk', 'ct', 'pc', ' c')
             if any(term in size for term in useless_units):
                 parseable_size = ''
             else:
@@ -462,18 +462,69 @@ class App(customtkinter.CTk):
     def product_info_event(self, data):
         for widget in self.subframe_product_info.winfo_children():
             widget.destroy()
+
         self.info_desc = customtkinter.CTkLabel(
             master=self.subframe_product_info, text=data[1],
             text_font=("Roboto Medium", -20))
-        self.info_desc.grid(row=0, column=0)
+        self.info_desc.grid(row=0, column=0, columnspan=2,
+                            padx=5, pady=15)
+
         self.info_upc = customtkinter.CTkLabel(
             master=self.subframe_product_info,
             text="UPC: " + data[0],
             justify="left",
             anchor="w",
-            text_font=("Roboto Medium", -14))
+            text_font=("Roboto Medium", -12))
         self.info_upc.grid(row=1, column=0, sticky="nswe",
-                           columnspan=2,)
+                           padx=5, pady=5)
+
+        self.info_size = customtkinter.CTkLabel(
+            master=self.subframe_product_info,
+            text="Size: " + data[2],
+            justify="left",
+            anchor="w",
+            text_font=("Roboto Medium", -12))
+        self.info_size.grid(row=2, column=0, sticky="nswe",
+                            padx=5, pady=5)
+
+        self.info_soldby = customtkinter.CTkLabel(
+            master=self.subframe_product_info,
+            text="Sold by: " + data[3].lower(),
+            justify="left",
+            anchor="w",
+            text_font=("Roboto Medium", -12))
+        self.info_soldby.grid(row=3, column=0, sticky="nswe",
+                              padx=5, pady=5)
+
+        self.info_reg_price = customtkinter.CTkLabel(
+            master=self.subframe_product_info,
+            text="Regular price: " + str("${:,.2f}".format(data[4])),
+            justify="left",
+            anchor="w",
+            text_font=("Roboto Medium", -12))
+        self.info_reg_price.grid(row=4, column=0, sticky="nswe",
+                                 padx=5, pady=5)
+
+        self.info_promo_price = customtkinter.CTkLabel(
+            master=self.subframe_product_info,
+            text="Promo price: " + str("${:,.2f}".format(data[5])),
+            justify="left",
+            anchor="w",
+            text_font=("Roboto Medium", -12))
+        self.info_promo_price.grid(row=5, column=0, sticky="nswe",
+                                   padx=5, pady=5)
+
+        unit_price = str("${:,.3f}".format(
+            (float(data[5]) / float(data[7])))) + "/" + str(f"{data[6]:~}")
+
+        self.info_unit_price = customtkinter.CTkLabel(
+            master=self.subframe_product_info,
+            text="Unit price: " + unit_price,
+            justify="left",
+            anchor="w",
+            text_font=("Roboto Medium", -12))
+        self.info_unit_price.grid(row=6, column=0, sticky="nswe",
+                                  padx=5, pady=5)
 
     # Application functions
     def change_mode(self):
