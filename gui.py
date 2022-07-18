@@ -611,8 +611,16 @@ class App(customtkinter.CTk):
             self.credentials_secret_entry.insert(END, self.client_secret)
             self.zip_entry.insert(END, self.zip)
             self.stores_optionmenu.configure(values=self.stores_list)
-            self.stores_optionmenu.set(self.store_name)
+            self.product_search_location.configure(values=self.stores_list)
+
+            locid = self.store_number
+            shortid = locid[locid.rfind('0', 3, 5)+1:]
+            set_store = self.store_name + " - Store #" + shortid \
+                + " (" + locid + ")"
+
+            self.stores_optionmenu.set(set_store)
             # self.stores_optionmenu.set(self.store_name)
+            self.product_search_location.set(set_store)
 
             self.is_token_expiring()
 
