@@ -15,7 +15,7 @@ Current features planned include:
 - [x] Checking prices on-demand
 - [ ] Tracking regular and sale prices over time
 - [ ] Creating reports of the best current sales 
-- [ ] Unit price comparisons
+- [x] Unit price comparisons
 
 
 Eventual planned features:
