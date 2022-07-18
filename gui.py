@@ -148,6 +148,8 @@ class App(customtkinter.CTk):
             master=self.frame_prices)
         self.subframe_product_info.grid(row=1, column=4, columnspan=4,
                                         pady=10, padx=10, sticky="nsew")
+        self.subframe_product_info.grid_columnconfigure(0, weight=1)
+        self.subframe_product_info.grid_columnconfigure(1, weight=10)
 
         # Create and arrange frame_historical_prices
 
@@ -445,19 +447,33 @@ class App(customtkinter.CTk):
                 unit_parse = ''
                 magnitude_parse = ''
                 print(error)
-            data = [upc, description]
+            data = [upc, description, size, sold_by, reg_price, promo_price,
+                    unit_parse, magnitude_parse, ]
             button_text = ''.join(description + " - "
                                   + size + " - "
                                   + str("${:,.2f}".format(promo_price)))
-            self.product_button = customtkinter.CTkButton(
+            self.product_list_button = customtkinter.CTkButton(
                 master=self.subframe_product_list,
                 text=button_text,
-                command=lambda data=data: self.product_button_event(data))
-            self.product_button.grid(row=i, column=0, columnspan=2,
-                                     sticky="nswe", padx=10, pady=5)
+                command=lambda data=data: self.product_info_event(data))
+            self.product_list_button.grid(row=i, column=0, columnspan=2,
+                                          sticky="nswe", padx=10, pady=5)
 
-    def product_button_event(self, data):
-        print(data[1], data[0])
+    def product_info_event(self, data):
+        for widget in self.subframe_product_info.winfo_children():
+            widget.destroy()
+        self.info_desc = customtkinter.CTkLabel(
+            master=self.subframe_product_info, text=data[1],
+            text_font=("Roboto Medium", -20))
+        self.info_desc.grid(row=0, column=0)
+        self.info_upc = customtkinter.CTkLabel(
+            master=self.subframe_product_info,
+            text="UPC: " + data[0],
+            justify="left",
+            anchor="w",
+            text_font=("Roboto Medium", -14))
+        self.info_upc.grid(row=1, column=0, sticky="nswe",
+                           columnspan=2,)
 
     # Application functions
     def change_mode(self):
