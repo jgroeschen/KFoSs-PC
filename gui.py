@@ -32,7 +32,7 @@ class App(customtkinter.CTk):
 
         # define ureg for pint
         self.ureg = pint.UnitRegistry()
-        self.ureg.default_system = 'imperial'
+        self.ureg.default_system = 'US'
 
         # Configure the window
         self.title("KFoSs-PC -- The Kroger Family of Stores Price Checker")
@@ -415,7 +415,7 @@ class App(customtkinter.CTk):
                     parseable_size = ''
                 else:
                     parseable_size = (lb_oz[0].to(
-                        self.ureg.sys.imperial.oz) + lb_oz[1])
+                        self.ureg.sys.US.ounce) + lb_oz[1])
                     parseable_size = round(parseable_size, 3)
                     parseable_size = str(parseable_size)
             else:
@@ -427,11 +427,13 @@ class App(customtkinter.CTk):
                 try:
                     parseable_size = parseable_size.to('fluid_ounce')
                 except Exception as error:
-                    print("Error: Not a fluid, apparently")
+                    # print("Error: Not a fluid, apparently")
+                    pass
                 try:
                     parseable_size = parseable_size.to('ounce')
                 except Exception as error:
-                    print("Error: Not a solid, either?")
+                    # print("Error: Not a solid, either?")
+                    pass
             sold_by = products.get("data")[i].get('items')[0].get('soldBy')
             try:
                 reg_price = products.get("data")[i].get('items')[0].get(
@@ -477,16 +479,16 @@ class App(customtkinter.CTk):
 
         self.info_desc = customtkinter.CTkLabel(
             master=self.subframe_product_info, text=data[1],
-            text_font=("Roboto Medium", -20))
+            text_font=("", -18))
         self.info_desc.grid(row=0, column=0, columnspan=2,
-                            padx=5, pady=15)
+                            padx=2, pady=15)
 
         self.info_upc = customtkinter.CTkLabel(
             master=self.subframe_product_info,
             text="UPC: " + data[0],
             justify="left",
             anchor="w",
-            text_font=("Roboto Medium", -12))
+            text_font=("", -12))
         self.info_upc.grid(row=1, column=0, sticky="nswe",
                            padx=5, pady=5)
 
@@ -495,7 +497,7 @@ class App(customtkinter.CTk):
             text="Size: " + data[2],
             justify="left",
             anchor="w",
-            text_font=("Roboto Medium", -12))
+            text_font=("", -12))
         self.info_size.grid(row=2, column=0, sticky="nswe",
                             padx=5, pady=5)
 
@@ -504,7 +506,7 @@ class App(customtkinter.CTk):
             text="Sold by: " + data[3].lower(),
             justify="left",
             anchor="w",
-            text_font=("Roboto Medium", -12))
+            text_font=("", -12))
         self.info_soldby.grid(row=3, column=0, sticky="nswe",
                               padx=5, pady=5)
 
@@ -513,7 +515,7 @@ class App(customtkinter.CTk):
             text="Regular price: " + str("${:,.2f}".format(data[4])),
             justify="left",
             anchor="w",
-            text_font=("Roboto Medium", -12))
+            text_font=("", -12))
         self.info_reg_price.grid(row=4, column=0, sticky="nswe",
                                  padx=5, pady=5)
 
@@ -522,19 +524,22 @@ class App(customtkinter.CTk):
             text="Promo price: " + str("${:,.2f}".format(data[5])),
             justify="left",
             anchor="w",
-            text_font=("Roboto Medium", -12))
+            text_font=("", -12))
         self.info_promo_price.grid(row=5, column=0, sticky="nswe",
                                    padx=5, pady=5)
 
-        unit_price = str("${:,.3f}".format(
-            (float(data[5]) / float(data[7])))) + "/" + str(f"{data[6]:~}")
+        if data[7] == '':
+            unit_price = "Unable to compute"
+        else:
+            unit_price = str("${:,.3f}".format(
+                (float(data[5]) / float(data[7])))) + "/" + str(f"{data[6]:~}")
 
         self.info_unit_price = customtkinter.CTkLabel(
             master=self.subframe_product_info,
             text="Unit price: " + unit_price,
             justify="left",
             anchor="w",
-            text_font=("Roboto Medium", -12))
+            text_font=("", -12))
         self.info_unit_price.grid(row=6, column=0, sticky="nswe",
                                   padx=5, pady=5)
 
