@@ -12,6 +12,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from requests_oauthlib import OAuth2Session
 import pint
+from datetime import datetime
 import pandas as pd
 import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -467,6 +468,20 @@ class App(customtkinter.CTk):
                 unit_parse = ''
                 magnitude_parse = ''
                 print(error)
+
+            # Set today's price for items
+            today = datetime.now().strftime("%Y-%m-%d")
+            if upc in self.df.UPC.values:
+                self.df.loc[(self.df["UPC"] == upc, [today])] = \
+                    f'{reg_price}, {promo_price}'
+            else:
+                self.df = self.df.append({'UPC': upc, 'Brand': brand,
+                                          'Description': description,
+                                          'Size': size,
+                                          'Sold By': sold_by,
+                                          today: f'{reg_price}, {promo_price}',
+                                          }, ignore_index=True)
+
             data = [upc, description, size, sold_by, reg_price, promo_price,
                     unit_parse, magnitude_parse, percent]
             button_text = ''.join(description + " - "
@@ -597,7 +612,7 @@ class App(customtkinter.CTk):
         ax = fig.add_subplot(111)
         ax.yaxis.set_major_formatter('${x:1.2f}')
 
-        split.plot(ax=ax)
+        split.plot(style=['ro-', 'b^-'], linewidth=2.0, ax=ax)
 
         canvas = FigureCanvasTkAgg(fig, master=self.subframe_product_info,)
         # canvas.show()
