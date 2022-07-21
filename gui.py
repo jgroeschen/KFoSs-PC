@@ -464,7 +464,7 @@ class App(customtkinter.CTk):
                 magnitude_parse = ''
                 print(error)
             data = [upc, description, size, sold_by, reg_price, promo_price,
-                    unit_parse, magnitude_parse, ]
+                    unit_parse, magnitude_parse, percent]
             button_text = ''.join(description + " - "
                                   + size + " - "
                                   + str("${:,.2f}".format(promo_price)))
@@ -490,7 +490,7 @@ class App(customtkinter.CTk):
             text="UPC: " + data[0],
             justify="left",
             anchor="w",
-            text_font=("", -12))
+            text_font=("", -14))
         self.info_upc.grid(row=1, column=0, sticky="nswe",
                            padx=5, pady=5)
 
@@ -499,7 +499,7 @@ class App(customtkinter.CTk):
             text="Size: " + data[2],
             justify="left",
             anchor="w",
-            text_font=("", -12))
+            text_font=("", -14))
         self.info_size.grid(row=2, column=0, sticky="nswe",
                             padx=5, pady=5)
 
@@ -508,7 +508,7 @@ class App(customtkinter.CTk):
             text="Sold by: " + data[3].lower(),
             justify="left",
             anchor="w",
-            text_font=("", -12))
+            text_font=("", -14))
         self.info_soldby.grid(row=3, column=0, sticky="nswe",
                               padx=5, pady=5)
 
@@ -517,7 +517,7 @@ class App(customtkinter.CTk):
             text="Regular price: " + str("${:,.2f}".format(data[4])),
             justify="left",
             anchor="w",
-            text_font=("", -12))
+            text_font=("", -14))
         self.info_reg_price.grid(row=4, column=0, sticky="nswe",
                                  padx=5, pady=5)
 
@@ -526,7 +526,7 @@ class App(customtkinter.CTk):
             text="Promo price: " + str("${:,.2f}".format(data[5])),
             justify="left",
             anchor="w",
-            text_font=("", -12))
+            text_font=("", -14))
         self.info_promo_price.grid(row=5, column=0, sticky="nswe",
                                    padx=5, pady=5)
 
@@ -541,14 +541,35 @@ class App(customtkinter.CTk):
             text="Unit price: " + unit_price,
             justify="left",
             anchor="w",
-            text_font=("", -12))
+            text_font=("", -14))
         self.info_unit_price.grid(row=6, column=0, sticky="nswe",
                                   padx=5, pady=5)
 
+        self.info_percent = customtkinter.CTkLabel(
+            master=self.subframe_product_info,
+            text="Percent discounted: " + str(data[8]) + "%",
+            justify="left",
+            anchor="w",
+            text_font=("", -14))
+        self.info_percent.grid(row=7, column=0, sticky="nswe",
+                               padx=5, pady=5)
+
+        # Get photo; Kroger web server redirects to never-ending 404 page
         picURL = "https://www.kroger.com/product/images/medium/front/" \
             + data[0]
-        response = requests.get(picURL, stream=all)
-        image = Image.open(BytesIO(response.content))
+        try:
+            response = requests.get(picURL, stream=all, verify=True, timeout=2)
+            if response.ok:
+                header_byte = response.content[0:3].hex()
+                if header_byte == 'ffd8ff':
+                    image = Image.open(BytesIO(response.content))
+                else:
+                    image = Image.open("no_image.jpg")
+            else:
+                image = Image.open("no_image.jpg")
+        except Exception as e:
+            image = Image.open("no_image.jpg")
+            print(e)
         tkphoto = ImageTk.PhotoImage(image)
 
         self.info_picture = customtkinter.CTkLabel(
@@ -556,7 +577,7 @@ class App(customtkinter.CTk):
             image=tkphoto)
         self.info_picture.image = tkphoto
         self.info_picture.grid(row=1, column=1, sticky="nswe",
-                               padx=5, pady=5, rowspan=6)
+                               padx=5, pady=5, rowspan=7)
 
     # Application functions
     def change_mode(self):
