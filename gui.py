@@ -12,6 +12,10 @@ import requests
 from requests.auth import HTTPBasicAuth
 from requests_oauthlib import OAuth2Session
 import pint
+import pandas as pd
+import matplotlib
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 
 # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_appearance_mode("System")
@@ -579,6 +583,26 @@ class App(customtkinter.CTk):
         self.info_picture.grid(row=1, column=1, sticky="nswe",
                                padx=5, pady=5, rowspan=7)
 
+        # Plot the historical data
+        single = self.df[self.df['UPC'] == data[0]].drop(
+            self.df.columns[[range(5)]], axis=1)
+        split = single.apply(
+            lambda x: x.str.split(',').explode()).reset_index()
+        split = split.drop(split.columns[0], axis=1)
+        split = split.astype('float')
+        split = split.transpose()
+        split.rename(columns={0: 'Regular', 1: 'Promo'}, inplace=True)
+
+        fig = Figure(figsize=(7, 4), dpi=100)
+        ax = fig.add_subplot(111)
+        ax.yaxis.set_major_formatter('${x:1.2f}')
+
+        split.plot(ax=ax)
+
+        canvas = FigureCanvasTkAgg(fig, master=self.subframe_product_info,)
+        # canvas.show()
+        canvas.get_tk_widget().grid(row=8, column=0, columnspan=2)
+
     # Application functions
     def change_mode(self):
         if self.dark_mode_switch.get() == 1:
@@ -678,6 +702,9 @@ class App(customtkinter.CTk):
             self.price_check_button.configure(state=tkinter.NORMAL)
             self.historical_prices_button.configure(state=tkinter.NORMAL)
             self.frame_prices.lift()
+
+        self.df = pd.read_csv('pricing-data.csv.xz',
+                              converters={'UPC': str, })
 
 
 if __name__ == "__main__":
