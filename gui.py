@@ -1,23 +1,23 @@
 import configparser
+from datetime import datetime
+from io import BytesIO
 import time
 import tkinter
 import tkinter.messagebox
 from tkinter import END
 
 import customtkinter
-from PIL import Image, ImageTk
-from io import BytesIO
-from oauthlib.oauth2 import BackendApplicationClient
-import requests
-from requests.auth import HTTPBasicAuth
-from requests_oauthlib import OAuth2Session
-import pint
-from datetime import datetime
-import pandas as pd
 import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+from oauthlib.oauth2 import BackendApplicationClient
+import pandas as pd
 from pandastable import Table, TableModel
+from PIL import Image, ImageTk
+import pint
+import requests
+from requests.auth import HTTPBasicAuth
+from requests_oauthlib import OAuth2Session
 
 # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_appearance_mode("System")
@@ -37,6 +37,7 @@ class App(customtkinter.CTk):
         self.store_name = ''
         self.store_number = ''
         self.zip = ''
+        # Read data; placing this in load_settings broke pandastable
         self.df = pd.read_csv('pricing-data.csv.xz',
                               converters={'UPC': str, })
 
