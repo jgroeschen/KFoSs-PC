@@ -19,10 +19,10 @@ import requests
 from requests.auth import HTTPBasicAuth
 from requests_oauthlib import OAuth2Session
 
-# Modes: "System" (standard), "Dark", "Light"
-customtkinter.set_appearance_mode("System")
-# Themes: "blue" (standard), "green", "dark-blue"
-customtkinter.set_default_color_theme("blue")
+# Modes: 'System' (standard), 'Dark', 'Light'
+customtkinter.set_appearance_mode('System')
+# Themes: 'blue' (standard), 'green', 'dark-blue'
+customtkinter.set_default_color_theme('blue')
 
 
 class App(customtkinter.CTk):
@@ -46,15 +46,15 @@ class App(customtkinter.CTk):
         self.ureg.default_system = 'US'
 
         # Configure the window
-        self.title("KFoSs-PC -- The Kroger Family of Stores Price Checker")
+        self.title('KFoSs-PC -- The Kroger Family of Stores Price Checker')
         self.iconbitmap('price_check_dark.ico')
 
         self.minsize(960, 540)
         self.geometry(
-            f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}")
+            f'{self.winfo_screenwidth()}x{self.winfo_screenheight()}')
         self.state('zoomed')
 
-        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.protocol('WM_DELETE_WINDOW', self.on_closing)
 
         # Create a grid to hold left and right side frames ===================
         self.grid_columnconfigure(0, weight=0, minsize=200)
@@ -64,22 +64,22 @@ class App(customtkinter.CTk):
         # Create the frames
         self.frame_left = customtkinter.CTkFrame(master=self,
                                                  corner_radius=5)
-        self.frame_left.grid(row=0, column=0, sticky="nswe")
+        self.frame_left.grid(row=0, column=0, sticky='nswe')
 
         self.frame_prices = customtkinter.CTkFrame(master=self)
-        self.frame_prices.grid(row=0, column=1, sticky="nswe",
+        self.frame_prices.grid(row=0, column=1, sticky='nswe',
                                padx=10, pady=10)
 
         self.frame_historical_prices = customtkinter.CTkFrame(master=self)
-        self.frame_historical_prices.grid(row=0, column=1, sticky="nswe",
+        self.frame_historical_prices.grid(row=0, column=1, sticky='nswe',
                                           padx=10, pady=10)
 
         self.frame_closeouts = customtkinter.CTkFrame(master=self)
-        self.frame_closeouts.grid(row=0, column=1, sticky="nswe",
+        self.frame_closeouts.grid(row=0, column=1, sticky='nswe',
                                   padx=10, pady=10)
 
         self.frame_settings = customtkinter.CTkFrame(master=self)
-        self.frame_settings.grid(row=0, column=1, sticky="nswe",
+        self.frame_settings.grid(row=0, column=1, sticky='nswe',
                                  padx=10, pady=10)
 
         # Create and arrange frame_left
@@ -90,37 +90,37 @@ class App(customtkinter.CTk):
         self.frame_left.grid_rowconfigure(21, minsize=10)
 
         self.left_title = customtkinter.CTkLabel(
-            master=self.frame_left, text="KFoSs-PC",
-            text_font=("Roboto Medium", -24))
+            master=self.frame_left, text='KFoSs-PC',
+            text_font=('Roboto Medium', -24))
         self.left_title.grid(row=1, pady=10, padx=10)
 
         self.price_check_button = customtkinter.CTkButton(
-            master=self.frame_left, text="Price Checker",
-            text_font=("Roboto", -18), fg_color=("gray70", "gray30"),
+            master=self.frame_left, text='Price Checker',
+            text_font=('Roboto', -18), fg_color=('gray70', 'gray30'),
             command=self.prices_button_event)
         self.price_check_button.grid(row=3, pady=10, padx=10, ipadx=10,
-                                     ipady=5, sticky="we")
+                                     ipady=5, sticky='we')
         self.price_check_button.configure(state=tkinter.DISABLED)
 
         self.historical_prices_button = customtkinter.CTkButton(
-            master=self.frame_left, text="Historical Prices",
-            text_font=("Roboto", -18), fg_color=("gray70", "gray30"),
+            master=self.frame_left, text='Historical Prices',
+            text_font=('Roboto', -18), fg_color=('gray70', 'gray30'),
             command=self.historical_button_event)
         self.historical_prices_button.grid(row=4, pady=10, padx=10, ipadx=10,
-                                           ipady=5, sticky="we")
+                                           ipady=5, sticky='we')
         self.historical_prices_button.configure(state=tkinter.DISABLED)
 
         self.settings_button = customtkinter.CTkButton(
-            master=self.frame_left, text="Settings",
-            text_font=("Roboto", -18), fg_color=("gray70", "gray30"),
+            master=self.frame_left, text='Settings',
+            text_font=('Roboto', -18), fg_color=('gray70', 'gray30'),
             command=self.settings_button_event)
         self.settings_button.grid(row=5, pady=10, padx=10, ipadx=10, ipady=5,
-                                  sticky="we")
+                                  sticky='we')
 
         self.dark_mode_switch = customtkinter.CTkSwitch(
-            master=self.frame_left, text="Dark Mode",
+            master=self.frame_left, text='Dark Mode',
             command=self.change_mode)
-        self.dark_mode_switch.grid(row=20, pady=10, padx=20, sticky="w")
+        self.dark_mode_switch.grid(row=20, pady=10, padx=20, sticky='w')
         self.dark_mode_switch.select()
 
         # Create and arrange frame_prices
@@ -133,32 +133,32 @@ class App(customtkinter.CTk):
         self.product_search_bar = customtkinter.CTkEntry(
             master=self.frame_prices, )
         self.product_search_bar.grid(row=0, column=0, columnspan=5,
-                                     sticky="nswe", padx=10, pady=10)
+                                     sticky='nswe', padx=10, pady=10)
         self.product_search_bar.bind('<Return>',
                                      self.product_search_button_event)
 
         self.product_search_location = customtkinter.CTkOptionMenu(
             master=self.frame_prices, width=400,)
         self.product_search_location.grid(row=0, column=5, columnspan=2,
-                                          sticky="nswe", padx=10, pady=10)
+                                          sticky='nswe', padx=10, pady=10)
 
         self.product_search_button = customtkinter.CTkButton(
-            master=self.frame_prices, text="Search",
+            master=self.frame_prices, text='Search',
             command=self.product_search_button_event)
-        self.product_search_button.grid(row=0, column=7, sticky="nswe",
+        self.product_search_button.grid(row=0, column=7, sticky='nswe',
                                         padx=10, pady=10)
 
         self.subframe_product_list = customtkinter.CTkFrame(
             master=self.frame_prices)
         self.subframe_product_list.grid(row=1, column=0, columnspan=4,
-                                        sticky="nswe", padx=10, pady=10)
+                                        sticky='nswe', padx=10, pady=10)
         self.subframe_product_list.columnconfigure((0, 1,),
                                                    weight=1, uniform='x')
 
         self.subframe_product_info = customtkinter.CTkFrame(
             master=self.frame_prices)
         self.subframe_product_info.grid(row=1, column=4, columnspan=4,
-                                        pady=10, padx=10, sticky="nsew")
+                                        pady=10, padx=10, sticky='nsew')
         self.subframe_product_info.grid_columnconfigure(0, weight=1)
         self.subframe_product_info.grid_columnconfigure(1, weight=10)
 
@@ -178,96 +178,96 @@ class App(customtkinter.CTk):
         self.frame_settings.grid_rowconfigure(4, minsize=10)
 
         self.settings_title = customtkinter.CTkLabel(
-            master=self.frame_settings, text="KFoSs-PC Settings",
-            text_font=("Roboto Medium", -24))
+            master=self.frame_settings, text='KFoSs-PC Settings',
+            text_font=('Roboto Medium', -24))
         self.settings_title.grid(row=1, column=0, pady=10, padx=10)
 
         # Create and arrange settings_subframe_credentials
         self.settings_subframe_credentials = customtkinter.CTkFrame(
             master=self.frame_settings)
-        self.settings_subframe_credentials.grid(row=3, column=0, sticky="nswe",
+        self.settings_subframe_credentials.grid(row=3, column=0, sticky='nswe',
                                                 padx=20, pady=10)
 
         self.credentials_title = customtkinter.CTkLabel(
-            master=self.settings_subframe_credentials, text="Credentials",
-            text_font=("Roboto Medium", -24))
+            master=self.settings_subframe_credentials, text='Credentials',
+            text_font=('Roboto Medium', -24))
         self.credentials_title.grid(row=0, column=0, columnspan=3,
-                                    sticky="nswe", padx=20, pady=20)
+                                    sticky='nswe', padx=20, pady=20)
 
         self.credentials_id_label = customtkinter.CTkLabel(
-            master=self.settings_subframe_credentials, text="Enter your ID:")
-        self.credentials_id_label.grid(row=1, column=0, sticky="w",
+            master=self.settings_subframe_credentials, text='Enter your ID:')
+        self.credentials_id_label.grid(row=1, column=0, sticky='w',
                                        padx=20, pady=20)
 
         self.credentials_id_entry = customtkinter.CTkEntry(
             master=self.settings_subframe_credentials)
-        self.credentials_id_entry.grid(row=1, column=1, sticky="w",
+        self.credentials_id_entry.grid(row=1, column=1, sticky='w',
                                        padx=20, pady=20)
 
         self.credentials_secret_label = customtkinter.CTkLabel(
             master=self.settings_subframe_credentials,
-            text="Enter your Secret:")
-        self.credentials_secret_label.grid(row=3, column=0, sticky="w",
+            text='Enter your Secret:')
+        self.credentials_secret_label.grid(row=3, column=0, sticky='w',
                                            padx=20, pady=20)
 
         self.credentials_secret_entry = customtkinter.CTkEntry(
-            master=self.settings_subframe_credentials, show="*")
-        self.credentials_secret_entry.grid(row=3, column=1, sticky="w",
+            master=self.settings_subframe_credentials, show='*')
+        self.credentials_secret_entry.grid(row=3, column=1, sticky='w',
                                            padx=20, pady=20)
 
         self.credentials_button = customtkinter.CTkButton(
             master=self.settings_subframe_credentials,
-            text="Check your credentials",
+            text='Check your credentials',
             command=self.credentials_button_event)
-        self.credentials_button.grid(row=1, column=3, rowspan=3, sticky="nswe",
+        self.credentials_button.grid(row=1, column=3, rowspan=3, sticky='nswe',
                                      padx=20, pady=20)
 
         # Create and arrange settings_subframe_stores
         self.settings_subframe_stores = customtkinter.CTkFrame(
             master=self.frame_settings)
-        self.settings_subframe_stores.grid(row=5, column=0, sticky="nswe",
+        self.settings_subframe_stores.grid(row=5, column=0, sticky='nswe',
                                            padx=20, pady=10)
 
         self.stores_title = customtkinter.CTkLabel(
-            master=self.settings_subframe_stores, text="My Store",
-            text_font=("Roboto Medium", -24))
-        self.stores_title.grid(row=0, column=0, columnspan=3, sticky="nswe",
+            master=self.settings_subframe_stores, text='My Store',
+            text_font=('Roboto Medium', -24))
+        self.stores_title.grid(row=0, column=0, columnspan=3, sticky='nswe',
                                padx=20, pady=20)
 
         self.zip_label = customtkinter.CTkLabel(
-            master=self.settings_subframe_stores, text="Enter your ZIP:").grid(
-                row=2, column=0, sticky="w", padx=20, pady=20)
+            master=self.settings_subframe_stores, text='Enter your ZIP:').grid(
+                row=2, column=0, sticky='w', padx=20, pady=20)
 
         self.zip_entry = customtkinter.CTkEntry(
             master=self.settings_subframe_stores)
-        self.zip_entry.grid(row=2, column=1, sticky="nswe", padx=20, pady=20)
+        self.zip_entry.grid(row=2, column=1, sticky='nswe', padx=20, pady=20)
 
         self.chains_label = customtkinter.CTkLabel(
-            master=self.settings_subframe_stores, text="Select chain:").grid(
-                row=1, column=0, sticky="w", padx=20, pady=20)
+            master=self.settings_subframe_stores, text='Select chain:').grid(
+                row=1, column=0, sticky='w', padx=20, pady=20)
 
         self.chains_optionmenu = customtkinter.CTkOptionMenu(
             master=self.settings_subframe_stores, values=[''])
-        self.chains_optionmenu.grid(row=1, column=1, sticky="nswe",
+        self.chains_optionmenu.grid(row=1, column=1, sticky='nswe',
                                     padx=20, pady=20)
 
         self.stores_optionmenu = customtkinter.CTkOptionMenu(
             master=self.settings_subframe_stores, values=[''], width=400)
         self.stores_optionmenu.grid(row=3, column=0, columnspan=2,
-                                    sticky="nswe", padx=20, pady=20)
+                                    sticky='nswe', padx=20, pady=20)
 
         self.stores_search_button = customtkinter.CTkButton(
-            master=self.settings_subframe_stores, text="Find nearby stores",
+            master=self.settings_subframe_stores, text='Find nearby stores',
             command=self.stores_search_button_event)
         self.stores_search_button.grid(row=2, column=3, rowspan=1,
-                                       sticky="nswe", padx=20, pady=20)
+                                       sticky='nswe', padx=20, pady=20)
 
         self.stores_select_button = customtkinter.CTkButton(
-            master=self.settings_subframe_stores, text="Select this store",
+            master=self.settings_subframe_stores, text='Select this store',
             command=self.stores_select_button_event)
         self.stores_select_button.grid(row=3, column=3, rowspan=1,
-                                       sticky="nswe", padx=20, pady=20)
-        self.stores_select_button.configure(state="disabled")
+                                       sticky='nswe', padx=20, pady=20)
+        self.stores_select_button.configure(state='disabled')
 
         # Load Settings
         self.protocol('WM_TAKE_FOCUS', self.load_settings())
@@ -282,8 +282,8 @@ class App(customtkinter.CTk):
         full_token = oauth.fetch_token(
             token_url='https://api.kroger.com/v1/connect/oauth2/token',
             auth=auth)
-        self.just_token = full_token.get("access_token")
-        self.token_exp = full_token.get("expires_at")
+        self.just_token = full_token.get('access_token')
+        self.token_exp = full_token.get('expires_at')
         self.write_config('token', 'just_token', str(self.just_token))
         self.write_config('token', 'token_exp', str(self.token_exp))
 
@@ -296,15 +296,15 @@ class App(customtkinter.CTk):
     # API functions
     def get_chains(self):
         heads = {
-            "Accept": "application/json\\",
-            "Authorization": "Bearer " + self.just_token,
+            'Accept': 'application/json\\',
+            'Authorization': 'Bearer ' + self.just_token,
         }
         self.is_token_expiring()
-        chains_data = requests.get("https://api.kroger.com/v1/chains",
+        chains_data = requests.get('https://api.kroger.com/v1/chains',
                                    headers=heads).json()
         chains_list = []
-        for i in range(len(chains_data.get("data"))):
-            chains_list.append(chains_data.get("data")[i].get("name"))
+        for i in range(len(chains_data.get('data'))):
+            chains_list.append(chains_data.get('data')[i].get('name'))
         chains_list = [e for e in chains_list if e not in (
             'AMOCO', 'BP', 'COPPS', 'COVID', 'EG GROUP', 'FRED',
             'FRESH EATS MKT', 'HARRIS TEETER FUEL',
@@ -317,31 +317,31 @@ class App(customtkinter.CTk):
 
     def get_locations(self, zip, chain, limit):
         heads = {
-            "Accept": "application/json\\",
-            "Authorization": "Bearer " + self.just_token,
+            'Accept': 'application/json\\',
+            'Authorization': 'Bearer ' + self.just_token,
         }
         paras = {
-            "filter.zipCode.near": zip,
-            "filter.chain": chain,
-            "filter.limit": limit,
-            "filter.radiusInMiles": 25,
+            'filter.zipCode.near': zip,
+            'filter.chain': chain,
+            'filter.limit': limit,
+            'filter.radiusInMiles': 25,
         }
         self.is_token_expiring()
-        return requests.get("https://api.kroger.com/v1/locations",
+        return requests.get('https://api.kroger.com/v1/locations',
                             params=paras, headers=heads).json()
 
     def get_products(self, searchterm, limit, locID):
         heads = {
-            "Accept": "application/json\\",
-            "Authorization": "Bearer " + self.just_token,
+            'Accept': 'application/json\\',
+            'Authorization': 'Bearer ' + self.just_token,
         }
         params = {
-            "filter.term": searchterm,
-            "filter.limit": limit,
-            "filter.locationId": locID,
-            "filter.fulfillment": "ais",
+            'filter.term': searchterm,
+            'filter.limit': limit,
+            'filter.locationId': locID,
+            'filter.fulfillment': 'ais',
         }
-        return requests.get("https://api.kroger.com/v1/products",
+        return requests.get('https://api.kroger.com/v1/products',
                             params=params, headers=heads).json()
 
     # Credentials functions
@@ -352,8 +352,8 @@ class App(customtkinter.CTk):
         self.write_config('auth', 'c_s', str(self.client_secret))
         self.get_token()
         self.credentials_button.configure(
-                text="Credentials Verified",
-                fg_color="green", hover_color="green")
+                text='Credentials Verified',
+                fg_color='green', hover_color='green')
         self.chains_optionmenu.set('KROGER')
         chains_list = self.get_chains()
         self.chains_optionmenu.configure(values=chains_list)
@@ -366,16 +366,16 @@ class App(customtkinter.CTk):
         limit = 35
         stores_json = self.get_locations(zip, chain, limit)
         stores_list = []
-        for i in range(len(stores_json.get("data"))):
-            locid = str(stores_json.get("data")[i].get("locationId"))
+        for i in range(len(stores_json.get('data'))):
+            locid = str(stores_json.get('data')[i].get('locationId'))
             # Strip division number and leading zeros from location ID
             shortid = locid[locid.rfind('0', 3, 5)+1:]
-            stores_list.append(stores_json.get("data")[i].get("name")
-                               + " - Store #" + shortid + " (" + locid + ")")
+            stores_list.append(stores_json.get('data')[i].get('name')
+                               + ' - Store #' + shortid + ' (' + locid + ')')
         # Remove stores that are not retail stores
-        stores_list = [i for i in stores_list if "Pickup" not in i
-                       if "Walgreen" not in i if " Fuel " not in i
-                       if "Warehouse" not in i]
+        stores_list = [i for i in stores_list if 'Pickup' not in i
+                       if 'Walgreen' not in i if ' Fuel ' not in i
+                       if 'Warehouse' not in i]
         del stores_list[10:]  # Limit to 10 stores
         # Remove chain name from store name
         stores_list = [i[i.find(' - ')+3:] for i in stores_list]
@@ -415,10 +415,10 @@ class App(customtkinter.CTk):
         for widget in self.subframe_product_list.winfo_children():
             widget.destroy()
         for i in range(len(products.get('data'))):
-            upc = products.get("data")[i].get('upc')
-            description = products.get("data")[i].get('description')
-            brand = products.get("data")[i].get('brand')
-            size = products.get("data")[i].get('items')[0].get('size')
+            upc = products.get('data')[i].get('upc')
+            description = products.get('data')[i].get('description')
+            brand = products.get('data')[i].get('brand')
+            size = products.get('data')[i].get('items')[0].get('size')
             useless_units = (' / ', 'pk', 'ct', 'pc', ' c')
             if any(term in size for term in useless_units):
                 parseable_size = ''
@@ -444,22 +444,22 @@ class App(customtkinter.CTk):
                 try:
                     parseable_size = parseable_size.to('fluid_ounce')
                 except Exception as error:
-                    # print("Error: Not a fluid, apparently")
+                    # print('Error: Not a fluid, apparently')
                     pass
                 try:
                     parseable_size = parseable_size.to('ounce')
                 except Exception as error:
-                    # print("Error: Not a solid, either?")
+                    # print('Error: Not a solid, either?')
                     pass
-            sold_by = products.get("data")[i].get('items')[0].get('soldBy')
+            sold_by = products.get('data')[i].get('items')[0].get('soldBy')
             try:
-                reg_price = products.get("data")[i].get('items')[0].get(
+                reg_price = products.get('data')[i].get('items')[0].get(
                     'price').get('regular')
             except Exception as error:
                 reg_price = 0
                 print(error)
             try:
-                promo_price = products.get("data")[i].get('items')[0].get(
+                promo_price = products.get('data')[i].get('items')[0].get(
                     'price').get('promo')
             except Exception as error:
                 promo_price = 0
@@ -480,9 +480,9 @@ class App(customtkinter.CTk):
                 print(error)
 
             # Set today's price for items
-            today = datetime.now().strftime("%Y-%m-%d")
+            today = datetime.now().strftime('%Y-%m-%d')
             if upc in self.df.UPC.values:
-                self.df.loc[tuple((self.df["UPC"] == upc, [today]))] = \
+                self.df.loc[tuple((self.df['UPC'] == upc, [today]))] = \
                     f'{reg_price}|{promo_price}'
             else:
                 self.df = self.df.append({'UPC': upc, 'Brand': brand,
@@ -494,15 +494,15 @@ class App(customtkinter.CTk):
 
             data = [upc, description, size, sold_by, reg_price, promo_price,
                     unit_parse, magnitude_parse, percent]
-            button_text = ''.join(description + " - "
-                                  + size + " - "
-                                  + str("${:,.2f}".format(promo_price)))
+            button_text = ''.join(description + ' - '
+                                  + size + ' - '
+                                  + str('${:,.2f}'.format(promo_price)))
             self.product_list_button = customtkinter.CTkButton(
                 master=self.subframe_product_list,
                 text=button_text,
                 command=lambda data=data: self.product_info_event(data))
             self.product_list_button.grid(row=i, column=0, columnspan=2,
-                                          sticky="nswe", padx=10, pady=5)
+                                          sticky='nswe', padx=10, pady=5)
         self.df.to_csv('pricing-data.csv.xz', index=False)
 
     def product_info_event(self, data):
@@ -511,81 +511,81 @@ class App(customtkinter.CTk):
 
         self.info_desc = customtkinter.CTkLabel(
             master=self.subframe_product_info, text=data[1],
-            text_font=("", -18))
+            text_font=('', -18))
         self.info_desc.grid(row=0, column=0, columnspan=2,
                             padx=2, pady=15)
 
         self.info_upc = customtkinter.CTkLabel(
             master=self.subframe_product_info,
-            text="UPC: " + data[0],
-            justify="left",
-            anchor="w",
-            text_font=("", -14))
-        self.info_upc.grid(row=1, column=0, sticky="nswe",
+            text='UPC: ' + data[0],
+            justify='left',
+            anchor='w',
+            text_font=('', -14))
+        self.info_upc.grid(row=1, column=0, sticky='nswe',
                            padx=5, pady=5)
 
         self.info_size = customtkinter.CTkLabel(
             master=self.subframe_product_info,
-            text="Size: " + data[2],
-            justify="left",
-            anchor="w",
-            text_font=("", -14))
-        self.info_size.grid(row=2, column=0, sticky="nswe",
+            text='Size: ' + data[2],
+            justify='left',
+            anchor='w',
+            text_font=('', -14))
+        self.info_size.grid(row=2, column=0, sticky='nswe',
                             padx=5, pady=5)
 
         self.info_soldby = customtkinter.CTkLabel(
             master=self.subframe_product_info,
-            text="Sold by: " + data[3].lower(),
-            justify="left",
-            anchor="w",
-            text_font=("", -14))
-        self.info_soldby.grid(row=3, column=0, sticky="nswe",
+            text='Sold by: ' + data[3].lower(),
+            justify='left',
+            anchor='w',
+            text_font=('', -14))
+        self.info_soldby.grid(row=3, column=0, sticky='nswe',
                               padx=5, pady=5)
 
         self.info_reg_price = customtkinter.CTkLabel(
             master=self.subframe_product_info,
-            text="Regular price: " + str("${:,.2f}".format(data[4])),
-            justify="left",
-            anchor="w",
-            text_font=("", -14))
-        self.info_reg_price.grid(row=4, column=0, sticky="nswe",
+            text='Regular price: ' + str('${:,.2f}'.format(data[4])),
+            justify='left',
+            anchor='w',
+            text_font=('', -14))
+        self.info_reg_price.grid(row=4, column=0, sticky='nswe',
                                  padx=5, pady=5)
 
         self.info_promo_price = customtkinter.CTkLabel(
             master=self.subframe_product_info,
-            text="Promo price: " + str("${:,.2f}".format(data[5])),
-            justify="left",
-            anchor="w",
-            text_font=("", -14))
-        self.info_promo_price.grid(row=5, column=0, sticky="nswe",
+            text='Promo price: ' + str('${:,.2f}'.format(data[5])),
+            justify='left',
+            anchor='w',
+            text_font=('', -14))
+        self.info_promo_price.grid(row=5, column=0, sticky='nswe',
                                    padx=5, pady=5)
 
         if data[7] == '':
-            unit_price = "Unable to compute"
+            unit_price = 'Unable to compute'
         else:
-            unit_price = str("${:,.3f}".format(
-                (float(data[5]) / float(data[7])))) + "/" + str(f"{data[6]:~}")
+            unit_price = str('${:,.3f}'.format(
+                (float(data[5]) / float(data[7])))) + '/' + str(f'{data[6]:~}')
 
         self.info_unit_price = customtkinter.CTkLabel(
             master=self.subframe_product_info,
-            text="Unit price: " + unit_price,
-            justify="left",
-            anchor="w",
-            text_font=("", -14))
-        self.info_unit_price.grid(row=6, column=0, sticky="nswe",
+            text='Unit price: ' + unit_price,
+            justify='left',
+            anchor='w',
+            text_font=('', -14))
+        self.info_unit_price.grid(row=6, column=0, sticky='nswe',
                                   padx=5, pady=5)
 
         self.info_percent = customtkinter.CTkLabel(
             master=self.subframe_product_info,
-            text="Percent discounted: " + str(data[8]) + "%",
-            justify="left",
-            anchor="w",
-            text_font=("", -14))
-        self.info_percent.grid(row=7, column=0, sticky="nswe",
+            text='Percent discounted: ' + str(data[8]) + '%',
+            justify='left',
+            anchor='w',
+            text_font=('', -14))
+        self.info_percent.grid(row=7, column=0, sticky='nswe',
                                padx=5, pady=5)
 
         # Get photo; Kroger web server redirects to never-ending 404 page
-        picURL = "https://www.kroger.com/product/images/medium/front/" \
+        picURL = 'https://www.kroger.com/product/images/medium/front/' \
             + data[0]
         try:
             response = requests.get(picURL, stream=all, verify=True, timeout=2)
@@ -594,11 +594,11 @@ class App(customtkinter.CTk):
                 if header_byte == 'ffd8ff':
                     image = Image.open(BytesIO(response.content))
                 else:
-                    image = Image.open("no_image.jpg")
+                    image = Image.open('no_image.jpg')
             else:
-                image = Image.open("no_image.jpg")
+                image = Image.open('no_image.jpg')
         except Exception as e:
-            image = Image.open("no_image.jpg")
+            image = Image.open('no_image.jpg')
             print(e)
         tkphoto = ImageTk.PhotoImage(image)
 
@@ -606,7 +606,7 @@ class App(customtkinter.CTk):
             master=self.subframe_product_info,
             image=tkphoto)
         self.info_picture.image = tkphoto
-        self.info_picture.grid(row=1, column=1, sticky="nswe",
+        self.info_picture.grid(row=1, column=1, sticky='nswe',
                                padx=5, pady=5, rowspan=7)
 
         # Plot the historical data
@@ -632,12 +632,12 @@ class App(customtkinter.CTk):
     # Application functions
     def change_mode(self):
         if self.dark_mode_switch.get() == 1:
-            customtkinter.set_appearance_mode("dark")
-            self.state("zoomed")
+            customtkinter.set_appearance_mode('dark')
+            self.state('zoomed')
             self.iconbitmap('price_check_dark.ico')
         else:
-            customtkinter.set_appearance_mode("light")
-            self.state("zoomed")
+            customtkinter.set_appearance_mode('light')
+            self.state('zoomed')
             self.iconbitmap('price_check.ico')
 
     def on_closing(self, event=0):
@@ -706,8 +706,8 @@ class App(customtkinter.CTk):
 
             locid = self.store_number
             shortid = locid[locid.rfind('0', 3, 5)+1:]
-            set_store = self.store_name + " - Store #" + shortid \
-                + " (" + locid + ")"
+            set_store = self.store_name + ' - Store #' + shortid \
+                + ' (' + locid + ')'
 
             self.stores_optionmenu.set(set_store)
             # self.stores_optionmenu.set(self.store_name)
@@ -716,8 +716,8 @@ class App(customtkinter.CTk):
             self.is_token_expiring()
 
             self.credentials_button.configure(
-                text="Credentials Verified",
-                fg_color="green", hover_color="green")
+                text='Credentials Verified',
+                fg_color='green', hover_color='green')
 
             # Get list of chains and populate chains optionmenu
             self.chains_optionmenu.set('KROGER')
@@ -732,6 +732,6 @@ class App(customtkinter.CTk):
         # self.pt.updateModel(TableModel(self.df))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app = App()
     app.start()
