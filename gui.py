@@ -17,6 +17,7 @@ import pandas as pd
 import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+from pandastable import Table, TableModel
 
 # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_appearance_mode("System")
@@ -36,6 +37,8 @@ class App(customtkinter.CTk):
         self.store_name = ''
         self.store_number = ''
         self.zip = ''
+        self.df = pd.read_csv('pricing-data.csv.xz',
+                              converters={'UPC': str, })
 
         # define ureg for pint
         self.ureg = pint.UnitRegistry()
@@ -159,6 +162,12 @@ class App(customtkinter.CTk):
         self.subframe_product_info.grid_columnconfigure(1, weight=10)
 
         # Create and arrange frame_historical_prices
+
+        self.historical_prices_table = self.pt = Table(
+            self.frame_historical_prices,
+            dataframe=self.df,
+            showtoolbar=True, showstatusbar=True)
+        self.pt.show()
 
         # Create and arrange frame_closeouts
 
@@ -719,8 +728,7 @@ class App(customtkinter.CTk):
             self.historical_prices_button.configure(state=tkinter.NORMAL)
             self.frame_prices.lift()
 
-        self.df = pd.read_csv('pricing-data.csv.xz',
-                              converters={'UPC': str, })
+        # self.pt.updateModel(TableModel(self.df))
 
 
 if __name__ == "__main__":
