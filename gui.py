@@ -5,6 +5,8 @@ import tkinter.messagebox
 from tkinter import END
 
 import customtkinter
+from PIL import Image, ImageTk
+from io import BytesIO
 from oauthlib.oauth2 import BackendApplicationClient
 import requests
 from requests.auth import HTTPBasicAuth
@@ -542,6 +544,19 @@ class App(customtkinter.CTk):
             text_font=("", -12))
         self.info_unit_price.grid(row=6, column=0, sticky="nswe",
                                   padx=5, pady=5)
+
+        picURL = "https://www.kroger.com/product/images/medium/front/" \
+            + data[0]
+        response = requests.get(picURL, stream=all)
+        image = Image.open(BytesIO(response.content))
+        tkphoto = ImageTk.PhotoImage(image)
+
+        self.info_picture = customtkinter.CTkLabel(
+            master=self.subframe_product_info,
+            image=tkphoto)
+        self.info_picture.image = tkphoto
+        self.info_picture.grid(row=1, column=1, sticky="nswe",
+                               padx=5, pady=5, rowspan=6)
 
     # Application functions
     def change_mode(self):
