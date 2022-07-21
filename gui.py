@@ -493,6 +493,7 @@ class App(customtkinter.CTk):
                 command=lambda data=data: self.product_info_event(data))
             self.product_list_button.grid(row=i, column=0, columnspan=2,
                                           sticky="nswe", padx=10, pady=5)
+        self.df.to_csv('pricing-data.csv.xz', index=False)
 
     def product_info_event(self, data):
         for widget in self.subframe_product_info.winfo_children():
