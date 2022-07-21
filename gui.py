@@ -472,8 +472,8 @@ class App(customtkinter.CTk):
             # Set today's price for items
             today = datetime.now().strftime("%Y-%m-%d")
             if upc in self.df.UPC.values:
-                self.df.loc[(self.df["UPC"] == upc, [today])] = \
-                    f'{reg_price}, {promo_price}'
+                self.df.loc[tuple((self.df["UPC"] == upc, [today]))] = \
+                    f'{reg_price}|{promo_price}'
             else:
                 self.df = self.df.append({'UPC': upc, 'Brand': brand,
                                           'Description': description,
@@ -603,7 +603,7 @@ class App(customtkinter.CTk):
         single = self.df[self.df['UPC'] == data[0]].drop(
             self.df.columns[[range(5)]], axis=1)
         split = single.apply(
-            lambda x: x.str.split(',').explode()).reset_index()
+            lambda x: x.str.split('|').explode()).reset_index()
         split = split.drop(split.columns[0], axis=1)
         split = split.astype('float')
         split = split.transpose()
