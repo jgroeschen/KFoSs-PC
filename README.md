@@ -58,7 +58,7 @@ The
         python gui.py
     and the gui will load. 
 
-5. If this is the first time you have run the program, you will have to enter credentials obtained from the [Kroger Developer site](developer.kroger.com).
+5. If this is the first time you have run the program, you will have to enter credentials obtained from the [Kroger Developer site](https://developer.kroger.com).
 Register, create an app under the "Production" environment, and use the credentials you create. 
 The credentials I am using to test this application are not provided in the Github repo, for security purposes.
 **Code Louisville/Code Kentucky mentor(s) reviewing this project have access to the credentials provided via the project submission form.**
