@@ -35,7 +35,7 @@ Dream goals:
 
 1. I used the `requests` library to read data in from Kroger's [public API](https://api.kroger.com/), using both the "Products" and "Locations" APIs.
 
-2. The data is returned from the API in JSON format, and is generally pretty clean and organized, but some was missing or wrong and some was extraneous. For example, if an item is not on sale, the "promo" key has a value of zero rather than being blank or null. The "Locations" API, on the other hand, returns chain names that aren't Kroger subsidiaries and locations of warehouses mixed in with publically-accessible stores.
+2. The data is returned from the API in JSON format, and is generally pretty clean and organized, but some was missing or wrong and some was extraneous. For example, if an item is not on sale, the "promo" key has a value of zero rather than being blank or null. The "Locations" API, on the other hand, returns chain names that aren't Kroger subsidiaries and locations of warehouses mixed in with publicly-accessible stores.
 
 3. The "Products" API doesn't return some information that I wanted to see. In addition to not showing past pricing data, it also doesn't provide unit prices or information about the percentage by which a product is discounted. With the help of the `pint` library, I wrote code to parse and display unit prices standardized for both liquid and solid measures. Some units returned by the API were unusable (especially ones including both count and size, which were inconsistent on whether the size was total or individual), and were excluded. Percentage discounts were a simpler subtraction of the promo price divided by the regular price from one, then standardized into a percentage.
 
@@ -88,7 +88,7 @@ Select the name of the chain, enter your ZIP code, find nearby stores, choose yo
 9. The "Historical Prices" tab contains a `pandastable` visualization of the DataFrame in the form of a spreadsheet of the data, with pricing shown by date in a regular|promo format.
 
 
-### **Credits and Acknowledgements**
+### **Credits and Acknowledgments**
 
 The code contained in this project is the product of my own mind.
 
