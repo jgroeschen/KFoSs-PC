@@ -15,7 +15,7 @@ Current features planned include:
 - [x] Finding local stores with the Locations API
 - [x] Checking prices on-demand with the Products API
 - [x] Tracking regular and sale prices over time
-- [ ] Creating reports of the best current sales 
+- [x] Creating reports of the best current sales 
 - [x] Unit price comparisons
 
 
@@ -80,12 +80,14 @@ The credentials I am using to test this application are not provided in the Gith
 Select the name of the chain, enter your ZIP code, find nearby stores, choose your store from the dropdown, and click the select button.
 
 7. You will be transferred to the "Price Checker" tab, where you can enter a search term and hit Enter or click the "Search" button to populate the left frame with results.
-    > **_NOTE:_**  This will hang the program for approximately five seconds (at least on my ~decade-old desktop), as currently it writes compressed data to "pricing-data.csv.xz" and is not yet threaded (and may not be for some time). Compressing to ".xz" results in a csv that is about 10% of the uncompressed size, so I decided the tradeoff was worth it. Extracting the uncompressed csv (I use [7-zip](https://www.7-zip.org/)) to the project directory alongside the compressed file and replacing the (currently two) instances of ".csv.xz" with ".csv" (both without the double quote marks) in gui.py will change this behavior. In the time it took me to write this note, I might have been able to add a setting in gui.py to switch, but I'm already invested here, I guess.
+    > **_NOTE:_**  This will hang the program for approximately five seconds (at least on my ~decade-old desktop), as currently it writes compressed data to "pricing-data.csv.xz" and is not yet threaded (and may not be for some time). Compressing to ".xz" results in a csv that is about 10% of the uncompressed size, so I decided the tradeoff was worth it.
 
 8. Clicking any of the results populates the right frame with information about your selection, including a graph of historical prices.
     > **_NOTE:_**  The "pricing-data.csv.xz" file included in this repo contains pricing data that has been pseudo-randomly anonymized for all dates prior to 2022-07-21, and should not be taken to be authoritative.
 
 9. The "Historical Prices" tab contains a `pandastable` visualization of the DataFrame in the form of a spreadsheet of the data, with pricing shown by date in a regular|promo format.
+
+10. The "Best Sales" tab contains another `pandastable` visualization, this time of all the most recent items with promotional prices, sorted in descending order by the percentage the product has been discounted from its regular price.
 
 
 ### **Credits and Acknowledgments**
