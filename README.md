@@ -1,8 +1,8 @@
 # **The Home of the KFoSs-PC Project**
 
 Thusly named because it is a 
-***K***roger ***F***amily ***o***f ***S***tore***s*** ***P***rice ***C***hecker
-and also because it connects you to ***K***roger's API via 
+***K***roger® ***F***amily ***o***f ***S***tore***s*** ***P***rice ***C***hecker
+and also because it connects you to ***K***roger's® API via 
 ***f***ree, ***o***pen-***s***ource ***s***oftware for your ***p***ersonal ***c***omputer 
 
 
@@ -33,9 +33,9 @@ Dream goals:
 
 # Code Kentucky/Code Louisville Requirements
 
-1. I used the `requests` library to read data in from Kroger's [public API](https://api.kroger.com/), using both the "Products" and "Locations" APIs.
+1. I used the `requests` library to read data in from Kroger's® [public API](https://api.kroger.com/), using both the "Products" and "Locations" APIs.
 
-2. The data is returned from the API in JSON format, and is generally pretty clean and organized, but some was missing or wrong and some was extraneous. For example, if an item is not on sale, the "promo" key has a value of zero rather than being blank or null. The "Locations" API, on the other hand, returns chain names that aren't Kroger subsidiaries and locations of warehouses mixed in with publicly-accessible stores.
+2. The data is returned from the API in JSON format, and is generally pretty clean and organized, but some was missing or wrong and some was extraneous. For example, if an item is not on sale, the "promo" key has a value of zero rather than being blank or null. The "Locations" API, on the other hand, returns chain names that aren't Kroger® subsidiaries and locations of warehouses mixed in with publicly-accessible stores.
 
 3. The "Products" API doesn't return some information that I wanted to see. In addition to not showing past pricing data, it also doesn't provide unit prices or information about the percentage by which a product is discounted. With the help of the `pint` library, I wrote code to parse and display unit prices standardized for both liquid and solid measures. Some units returned by the API were unusable (especially ones including both count and size, which were inconsistent on whether the size was total or individual), and were excluded. Percentage discounts were a simpler subtraction of the promo price divided by the regular price from one, then standardized into a percentage.
 
@@ -71,7 +71,7 @@ This project was developed under Python 3, most recently with version 3.10.4. It
         python gui.py
     and the gui will load. 
 
-5. If this is the first time you have run the program, you will have to enter credentials obtained from the [Kroger Developer site](https://developer.kroger.com).
+5. If this is the first time you have run the program, you will have to enter credentials obtained from the [Kroger® Developer site](https://developer.kroger.com).
 Register, create an app under the "Production" environment, and use the credentials you create. 
 The credentials I am using to test this application are not provided in the Github repo, for security purposes.
 
@@ -99,7 +99,7 @@ Thanks to [TomSchimansky](https://github.com/TomSchimansky) for the work done on
 
 Thanks to my wife for her unending support and love, throughout this project and always.
 
-This project is dedicated in loving memory of Jerry, who always gave me a good-natured ribbing when I bought something from a Kroger competitor.
+This project is dedicated in loving memory of Jerry, who always gave me a good-natured ribbing when I bought something from a Kroger® competitor.
 
 
 
