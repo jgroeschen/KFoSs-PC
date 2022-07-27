@@ -640,8 +640,9 @@ class App(customtkinter.CTk):
                                padx=5, pady=5, rowspan=7)
 
         # Plot the historical data
-        single = self.df[self.df['UPC'] == data[0]].drop(
-            self.df.columns[[range(5)]], axis=1)
+        single = self.df[self.df['UPC'] == data[0]]
+        single = single.drop(
+            columns=['UPC', 'Brand', 'Description', 'Size', 'Sold By'], axis=1)
         split = single.apply(
             lambda x: x.str.split('|').explode()).reset_index()
         split = split.drop(split.columns[0], axis=1)
