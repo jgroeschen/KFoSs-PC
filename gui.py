@@ -10,6 +10,7 @@ import customtkinter
 import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 from oauthlib.oauth2 import BackendApplicationClient
 import pandas as pd
 from pandastable import Table, TableModel
@@ -651,6 +652,7 @@ class App(customtkinter.CTk):
         fig = Figure(figsize=(7, 4), dpi=100)
         ax = fig.add_subplot(111)
         ax.yaxis.set_major_formatter('${x:1.2f}')
+        ax.xaxis.set_major_locator(plt.MaxNLocator(5))
 
         split.plot(style=['ro-', 'b^-'], linewidth=2.0, ax=ax)
 
