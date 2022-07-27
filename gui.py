@@ -74,6 +74,10 @@ class App(customtkinter.CTk):
         self.frame_historical_prices.grid(row=0, column=1, sticky='nswe',
                                           padx=10, pady=10)
 
+        self.frame_best_sales = customtkinter.CTkFrame(master=self)
+        self.frame_best_sales.grid(row=0, column=1, sticky='nswe',
+                                   padx=10, pady=10)
+
         self.frame_closeouts = customtkinter.CTkFrame(master=self)
         self.frame_closeouts.grid(row=0, column=1, sticky='nswe',
                                   padx=10, pady=10)
@@ -110,11 +114,19 @@ class App(customtkinter.CTk):
                                            ipady=5, sticky='we')
         self.historical_prices_button.configure(state=tkinter.DISABLED)
 
+        self.best_sales_button = customtkinter.CTkButton(
+            master=self.frame_left, text='Best Sales',
+            text_font=('Roboto', -18), fg_color=('gray70', 'gray30'),
+            command=self.sales_button_event)
+        self.best_sales_button.grid(row=5, pady=10, padx=10, ipadx=10,
+                                    ipady=5, sticky='we')
+        self.best_sales_button.configure(state=tkinter.DISABLED)
+
         self.settings_button = customtkinter.CTkButton(
             master=self.frame_left, text='Settings',
             text_font=('Roboto', -18), fg_color=('gray70', 'gray30'),
             command=self.settings_button_event)
-        self.settings_button.grid(row=5, pady=10, padx=10, ipadx=10, ipady=5,
+        self.settings_button.grid(row=6, pady=10, padx=10, ipadx=10, ipady=5,
                                   sticky='we')
 
         self.dark_mode_switch = customtkinter.CTkSwitch(
@@ -169,6 +181,22 @@ class App(customtkinter.CTk):
             dataframe=self.df,
             showtoolbar=True, showstatusbar=True)
         self.pt.show()
+
+        # Create and arrange frame_best_sales
+        self.frame_best_sales.grid_rowconfigure(0, weight=1)
+        self.frame_best_sales.grid_rowconfigure(1, weight=10)
+        self.frame_best_sales.columnconfigure([0, 2], weight=20)
+        self.frame_best_sales.columnconfigure(1, weight=1)
+
+        self.sales_refresh_button = customtkinter.CTkButton(
+            master=self.frame_best_sales,
+            text='Refresh current best sales',
+            command=self.sales_refresh_button_event)
+        self.sales_refresh_button.grid(row=0, column=1, sticky='nswe',)
+
+        self.subframe_best_sales = customtkinter.CTkFrame(
+            master=self.frame_best_sales)
+        self.subframe_best_sales.grid(row=1, columnspan=3, sticky='nswe',)
 
         # Create and arrange frame_closeouts
 
@@ -397,6 +425,7 @@ class App(customtkinter.CTk):
         self.write_config('location', 'location_name', self.store_name)
         self.price_check_button.configure(state=tkinter.NORMAL)
         self.historical_prices_button.configure(state=tkinter.NORMAL)
+        self.best_sales_button.configure(state=tkinter.NORMAL)
         self.product_search_location.set(self.store_selection)
         # self.product_search_location.configure(width=500)
         self.frame_prices.lift()
@@ -489,7 +518,7 @@ class App(customtkinter.CTk):
                                           'Description': description,
                                           'Size': size,
                                           'Sold By': sold_by,
-                                          today: f'{reg_price}, {promo_price}',
+                                          today: f'{reg_price}|{promo_price}',
                                           }, ignore_index=True)
 
             data = [upc, description, size, sold_by, reg_price, promo_price,
@@ -629,6 +658,39 @@ class App(customtkinter.CTk):
         # canvas.show()
         canvas.get_tk_widget().grid(row=8, column=0, columnspan=2)
 
+    def sales_refresh_button_event(self):
+        for widget in self.subframe_best_sales.winfo_children():
+            widget.destroy()
+
+        # Create DataFrame with most recent prices column
+        df_temp = self.df.iloc[:, [0, 2, 3, self.df.shape[1]-1]]
+        # Split into regular and sale prices, then drop rows w/o prices
+        df_temp = pd.concat(
+            [df_temp.iloc[:, [0, 1, 2]], df_temp.iloc[:, 3].str.split(
+                '|', expand=True)], axis=1)
+        df_temp.dropna(subset=[0], inplace=True)
+        # Convert strings to floats and divide for percentage discount
+        df_temp = df_temp.astype({0: 'float', 1: 'float'})
+        df_temp['Percent Discounted'] = 1 - (df_temp[1] / df_temp[0])
+        df_temp = df_temp[df_temp['Percent Discounted'] != 0]
+        # Rename new columns, then sort and format
+        df_temp.rename(columns={0: 'Regular', 1: 'Sale'}, inplace=True)
+        df_temp.sort_values(
+            by=['Percent Discounted'], ascending=False, inplace=True)
+        df_temp['Percent Discounted'] = df_temp['Percent Discounted'].map(
+            '{:,.0%}'.format)
+        # Create table and display
+        self.best_sales_table = self.pt2 = Table(
+            self.subframe_best_sales,
+            dataframe=df_temp,
+            showtoolbar=False, showstatusbar=False,
+            maxcellwidth=700)
+        self.pt2.show()
+        self.pt2.autoResizeColumns()
+        self.pt2.columnwidths['Percent Discounted'] = 175
+        self.pt2.rowheader.maxwidth = 200
+        self.pt2.redraw()
+
     # Application functions
     def change_mode(self):
         if self.dark_mode_switch.get() == 1:
@@ -676,6 +738,9 @@ class App(customtkinter.CTk):
 
     def settings_button_event(self):
         self.frame_settings.lift()
+
+    def sales_button_event(self):
+        self.frame_best_sales.lift()
 
     # Settings loader
     def load_settings(self):
@@ -727,6 +792,7 @@ class App(customtkinter.CTk):
             self.stores_select_button.configure(state=tkinter.NORMAL)
             self.price_check_button.configure(state=tkinter.NORMAL)
             self.historical_prices_button.configure(state=tkinter.NORMAL)
+            self.best_sales_button.configure(state=tkinter.NORMAL)
             self.frame_prices.lift()
 
         # self.pt.updateModel(TableModel(self.df))
