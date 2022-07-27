@@ -47,7 +47,7 @@ class App(customtkinter.CTk):
         self.ureg.default_system = 'US'
 
         # Configure the window
-        self.title('KFoSs-PC -- The Kroger Family of Stores Price Checker')
+        self.title('KFoSs-PC -- The Kroger® Family of Stores Price Checker')
         self.iconbitmap('price_check_dark.ico')
 
         self.minsize(960, 540)
@@ -614,7 +614,7 @@ class App(customtkinter.CTk):
         self.info_percent.grid(row=7, column=0, sticky='nswe',
                                padx=5, pady=5)
 
-        # Get photo; Kroger web server redirects to never-ending 404 page
+        # Get photo; Kroger® web server redirects to never-ending 404 page
         picURL = 'https://www.kroger.com/product/images/medium/front/' \
             + data[0]
         try:

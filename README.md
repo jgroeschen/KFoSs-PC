@@ -43,7 +43,8 @@ Dream goals:
 
 # Running the program
 
-This project was developed under Python 3, most recently with version 3.10.4.
+This project was developed under Python 3, most recently with version 3.10.4. Its layout was designed on a desktop with a display resolution of 1920x1080; other resolutions may not show the GUI properly. It runs as expected on Windows 10 (10.0.17763) and Ubuntu 20.04.2 LTS, but I have not tested it on MacOS or other systems not listed.
+
 
 ## How to Run the Program
 
@@ -87,7 +88,7 @@ Select the name of the chain, enter your ZIP code, find nearby stores, choose yo
 
 9. The "Historical Prices" tab contains a `pandastable` visualization of the DataFrame in the form of a spreadsheet of the data, with pricing shown by date in a regular|promo format.
 
-10. The "Best Sales" tab contains another `pandastable` visualization, this time of all the most recent items with promotional prices, sorted in descending order by the percentage the product has been discounted from its regular price.
+10. The "Best Sales" tab contains a button to activate/refresh another `pandastable` visualization, this time of all the most recent items with promotional prices, sorted in descending order by the percentage the product has been discounted from its regular price.
 
 
 ### **Credits and Acknowledgments**
