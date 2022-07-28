@@ -8,6 +8,10 @@ and also because it connects you to ***K***roger's® API via
 
 This project is in the early stages of development.
 It is, at present, a final project for the Code Kentucky/Code Louisville Data Analysis 1 course, but I plan to continue to develop it after the conclusion of the class.
+Inflation is on the rise, and I wanted to see what that looked like with a subset of grocery prices.
+But, more than that, I wanted to create a tool to go beyond confirming "yes, everything's getting more expensive, and here's how much more expensive it is to eat."
+I wanted to be able to compare prices with comparable units for weight and volume, and see what the best discounts, percentage-wise, there were on items I buy all the time.
+That's the goal of this project: to allow the user (me, but also anyone else who wanted to) to access pricing data from the largest grocery retailer in the US in a format that is more accessible than it is otherwise.
 
 
 Current features planned include:
@@ -23,13 +27,13 @@ Eventual planned features:
 - [ ] Historical low price reports
 - [ ] Local search to reduce API calls
 - [ ] Local sub-lists
-- [ ] Scheduled refreshing
+- [ ] Scheduled refreshing (I already wrote some code to gather data en masse {~15k products}, but it takes upwards of an hour to run and would need to be integrated into the current flow)
 
 
 Dream goals:
 - [ ] Cross-checking against coupons with the Identity/Cart API
-- [ ] Rebates, too
-- [ ] Searching multiple stores concurrently
+- [ ] Rebates, too (this would require going outside the API and scraping data from a logged-in user)
+- [ ] Searching multiple stores concurrently (this is honestly one of the easier features to implement, but it would eat into the API allowance fast)
 
 # Code Kentucky/Code Louisville Requirements
 
@@ -79,6 +83,7 @@ The credentials I am using to test this application are not provided in the Gith
 
 6. Once your credentials are verified, you can select the (presumably local) store you'd like to use as a data source for pricing information.
 Select the name of the chain, enter your ZIP code, find nearby stores, choose your store from the dropdown, and click the select button.
+    > **_NOTE:_** If you don't complete this process, or if your credentials don't verify, close the window and delete the `config.ini` file in the main directory before running `python gui.py` again; I'm in the process of untangling some `configparser` code I wrote very early in this project and it broke some other code I thought was unrelated the last time I ran it.
 
 7. You will be transferred to the "Price Checker" tab, where you can enter a search term and hit Enter or click the "Search" button to populate the left frame with results.
     > **_NOTE:_**  This will hang the program for approximately five seconds (at least on my ~decade-old desktop), as currently it writes compressed data to "pricing-data.csv.xz" and is not yet threaded (and may not be for some time). Compressing to ".xz" results in a csv that is about 10% of the uncompressed size, so I decided the tradeoff was worth it.
@@ -100,8 +105,6 @@ Thanks to [TomSchimansky](https://github.com/TomSchimansky) for the work done on
 Thanks to my wife for her unending support and love, throughout this project and always.
 
 This project is dedicated in loving memory of Jerry, who always gave me a good-natured ribbing when I bought something from a Kroger® competitor.
-
-
 
 
 ### **Legal**

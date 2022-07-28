@@ -38,6 +38,7 @@ class App(customtkinter.CTk):
         self.store_name = ''
         self.store_number = ''
         self.zip = ''
+
         # Read data; placing this in load_settings broke pandastable
         self.df = pd.read_csv('pricing-data.csv.xz',
                               converters={'UPC': str, })
@@ -50,14 +51,16 @@ class App(customtkinter.CTk):
         self.title('KFoSs-PC -- The Kroger® Family of Stores Price Checker')
         self.iconbitmap('price_check_dark.ico')
 
+        # Define minimum window size and maximize
         self.minsize(960, 540)
         self.geometry(
             f'{self.winfo_screenwidth()}x{self.winfo_screenheight()}')
         self.state('zoomed')
 
+        # Window closing process
         self.protocol('WM_DELETE_WINDOW', self.on_closing)
 
-        # Create a grid to hold left and right side frames ===================
+        # Create a grid to hold left and right side frames
         self.grid_columnconfigure(0, weight=0, minsize=200)
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -141,7 +144,6 @@ class App(customtkinter.CTk):
         self.frame_prices.rowconfigure(1, weight=10)
         self.frame_prices.columnconfigure((0, 1, 2, 3, 4, 5, 6, 7),
                                           weight=1, uniform='x')
-        # self.frame_prices.columnconfigure(2, weight=0)
 
         self.product_search_bar = customtkinter.CTkEntry(
             master=self.frame_prices, )
@@ -176,7 +178,6 @@ class App(customtkinter.CTk):
         self.subframe_product_info.grid_columnconfigure(1, weight=10)
 
         # Create and arrange frame_historical_prices
-
         self.historical_prices_table = self.pt = Table(
             self.frame_historical_prices,
             dataframe=self.df,
@@ -200,6 +201,7 @@ class App(customtkinter.CTk):
         self.subframe_best_sales.grid(row=1, columnspan=3, sticky='nswe',)
 
         # Create and arrange frame_closeouts
+        # Nothing here yet
 
         # Create and arrange frame_settings
         self.frame_settings.grid_rowconfigure(0, minsize=10)
@@ -308,6 +310,7 @@ class App(customtkinter.CTk):
         client = BackendApplicationClient(client_id=self.client_id,
                                           scope='product.compact')
         oauth = OAuth2Session(client=client, scope='product.compact')
+        # Fetch token and derive token/expiration
         full_token = oauth.fetch_token(
             token_url='https://api.kroger.com/v1/connect/oauth2/token',
             auth=auth)
@@ -334,6 +337,7 @@ class App(customtkinter.CTk):
         chains_list = []
         for i in range(len(chains_data.get('data'))):
             chains_list.append(chains_data.get('data')[i].get('name'))
+        # Remove gas stations and other unusable locations
         chains_list = [e for e in chains_list if e not in (
             'AMOCO', 'BP', 'COPPS', 'COVID', 'EG GROUP', 'FRED',
             'FRESH EATS MKT', 'HARRIS TEETER FUEL',
