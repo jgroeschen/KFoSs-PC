@@ -144,6 +144,5 @@ venv-KPC/Scripts/pip3.exe
 venv-KPC/Scripts/python.exe
 venv-KPC/Scripts/pythonw.exe
 venv-KPC/Scripts/Activate.ps1
-gathering/locations.py
 venv-KPC/Scripts/pycodestyle.exe
 .gitignore
