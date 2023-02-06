@@ -133,3 +133,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+venv-KPC/pyvenv.cfg
+venv-KPC/Scripts/activate
+venv-KPC/Scripts/activate.bat
+venv-KPC/Scripts/deactivate.bat
+venv-KPC/Scripts/pip.exe
+venv-KPC/Scripts/pip3.11.exe
+venv-KPC/Scripts/pip3.exe
+venv-KPC/Scripts/python.exe
+venv-KPC/Scripts/pythonw.exe
+venv-KPC/Scripts/Activate.ps1
