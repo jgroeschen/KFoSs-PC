@@ -7,7 +7,7 @@ and also because it connects you to ***K***roger's® API via
 
 
 This project is in the early stages of development.
-It is, at present, a final project for the Code Kentucky/Code Louisville Data Analysis 1 course, but I plan to continue to develop it after the conclusion of the class.
+It was begun as a final project for the Code Kentucky/Code Louisville Data Analysis 1 course, but I am now continuing to develop it after the conclusion of the class.
 Inflation is on the rise, and I wanted to see what that looked like with a subset of grocery prices.
 But, more than that, I wanted to create a tool to go beyond confirming "yes, everything's getting more expensive, and here's how much more expensive it is to eat."
 I wanted to be able to compare prices with comparable units for weight and volume, and see what the best discounts, percentage-wise, there were on items I buy all the time.
