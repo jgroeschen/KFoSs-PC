@@ -1,7 +1,7 @@
 import requests
 
 
-def get_chains(token: str) -> list:
+def get_chains(token: str,) -> list:
     '''Return a list of shoppable subsidiaries of the Kroger Company.
 
     Retrieves the current list of chains operated by Kroger, then filters out 
@@ -15,12 +15,12 @@ def get_chains(token: str) -> list:
         A list of shoppable and searchable grocery chains.
     '''
 
-    heads = {
+    headers = {
         'Accept': 'application/json\\',
         'Authorization': 'Bearer ' + token,
     }
     chains_data = requests.get('https://api.kroger.com/v1/chains',
-                               headers=heads)
+                               headers=headers)
     chains_list = []
     if chains_data.ok:
         chains_json = chains_data.json()
@@ -42,7 +42,7 @@ def get_locations(token: str,
                   zip: int = 45202,
                   chain: str = 'KROGER',
                   limit: int = 10,
-                  radius: int = 25
+                  radius: int = 25,
                   )-> dict:
     '''Return a dictionary of locations near a ZIP code.
 
