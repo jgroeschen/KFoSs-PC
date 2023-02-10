@@ -115,6 +115,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+venv-KPC/
 
 # Spyder project settings
 .spyderproject
@@ -143,3 +144,5 @@ venv-KPC/Scripts/pip3.exe
 venv-KPC/Scripts/python.exe
 venv-KPC/Scripts/pythonw.exe
 venv-KPC/Scripts/Activate.ps1
+venv-KPC/Scripts/pycodestyle.exe
+.gitignore
