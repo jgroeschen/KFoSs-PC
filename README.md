@@ -6,6 +6,9 @@ and also because it connects you to ***K***roger's® API via
 ***f***ree, ***o***pen-***s***ource ***s***oftware for your ***p***ersonal ***c***omputer 
 
 
+    NOTICE (2023-02-09): THIS PROJECT IS ON HIATUS
+    Since returning to KFoSS-PC after some time away, I have gone over the API documentation again, and found that some existing/planned features may violate the Acceptable Use Policy for the API. As far as I know, these terms were not present on my first read-through of the documentation when I began the project, but I have no evidence one way or the other (the page does not exist in either Archive.org's Wayback Machine or Google's cache, so I have no historical reference). For the time being, this project will remain here for posterity, and I will check in on the API from time to time to see if anything changes for the better.
+
 This project is in the early stages of development.
 It was begun as a final project for the Code Kentucky/Code Louisville Data Analysis 1 course, but I am now continuing to develop it after the conclusion of the class.
 Inflation is on the rise, and I wanted to see what that looked like with a subset of grocery prices.

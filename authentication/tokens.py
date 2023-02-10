@@ -30,8 +30,8 @@ def get_token(client_id: str,
         auth=auth)
     if full_token.get('access_token'):
         token = full_token.get('access_token')
-        # full_token.get('expires_at') will return the expiration time, but may be
-        # deprecated, as the API reference no longer lists expires_at as a response.
+        # .get('expires_at') will return the expiration time, but may be 
+        # deprecated; API reference no longer lists expires_at as a response.
         token_exp = time.time() + full_token.get('expires_in')
         return [token, token_exp]
     else:
