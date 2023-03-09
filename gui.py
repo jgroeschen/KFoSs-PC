@@ -40,8 +40,7 @@ class App(customtkinter.CTk):
         self.zip = ''
 
         # Read data; placing this in load_settings broke pandastable
-        self.df = pd.read_csv('pricing-data.csv.xz',
-                              converters={'UPC': str, })
+        self.df = pd.DataFrame()
 
         # define ureg for pint
         self.ureg = pint.UnitRegistry()
@@ -74,10 +73,6 @@ class App(customtkinter.CTk):
         self.frame_prices.grid(row=0, column=1, sticky='nswe',
                                padx=10, pady=10)
 
-        self.frame_historical_prices = customtkinter.CTkFrame(master=self)
-        self.frame_historical_prices.grid(row=0, column=1, sticky='nswe',
-                                          padx=10, pady=10)
-
         self.frame_best_sales = customtkinter.CTkFrame(master=self)
         self.frame_best_sales.grid(row=0, column=1, sticky='nswe',
                                    padx=10, pady=10)
@@ -99,28 +94,20 @@ class App(customtkinter.CTk):
 
         self.left_title = customtkinter.CTkLabel(
             master=self.frame_left, text='KFoSs-PC',
-            text_font=('Roboto Medium', -24))
+            font=('Roboto Medium', -24))
         self.left_title.grid(row=1, pady=10, padx=10)
 
         self.price_check_button = customtkinter.CTkButton(
             master=self.frame_left, text='Price Checker',
-            text_font=('Roboto', -18), fg_color=('gray70', 'gray30'),
+            font=('Roboto', -18), fg_color=('gray70', 'gray30'),
             command=self.prices_button_event)
         self.price_check_button.grid(row=3, pady=10, padx=10, ipadx=10,
                                      ipady=5, sticky='we')
         self.price_check_button.configure(state=tkinter.DISABLED)
 
-        self.historical_prices_button = customtkinter.CTkButton(
-            master=self.frame_left, text='Historical Prices',
-            text_font=('Roboto', -18), fg_color=('gray70', 'gray30'),
-            command=self.historical_button_event)
-        self.historical_prices_button.grid(row=4, pady=10, padx=10, ipadx=10,
-                                           ipady=5, sticky='we')
-        self.historical_prices_button.configure(state=tkinter.DISABLED)
-
         self.best_sales_button = customtkinter.CTkButton(
             master=self.frame_left, text='Best Sales',
-            text_font=('Roboto', -18), fg_color=('gray70', 'gray30'),
+            font=('Roboto', -18), fg_color=('gray70', 'gray30'),
             command=self.sales_button_event)
         self.best_sales_button.grid(row=5, pady=10, padx=10, ipadx=10,
                                     ipady=5, sticky='we')
@@ -128,7 +115,7 @@ class App(customtkinter.CTk):
 
         self.settings_button = customtkinter.CTkButton(
             master=self.frame_left, text='Settings',
-            text_font=('Roboto', -18), fg_color=('gray70', 'gray30'),
+            font=('Roboto', -18), fg_color=('gray70', 'gray30'),
             command=self.settings_button_event)
         self.settings_button.grid(row=6, pady=10, padx=10, ipadx=10, ipady=5,
                                   sticky='we')
@@ -177,13 +164,6 @@ class App(customtkinter.CTk):
         self.subframe_product_info.grid_columnconfigure(0, weight=1)
         self.subframe_product_info.grid_columnconfigure(1, weight=10)
 
-        # Create and arrange frame_historical_prices
-        self.historical_prices_table = self.pt = Table(
-            self.frame_historical_prices,
-            dataframe=self.df,
-            showtoolbar=True, showstatusbar=True)
-        self.pt.show()
-
         # Create and arrange frame_best_sales
         self.frame_best_sales.grid_rowconfigure(0, weight=1)
         self.frame_best_sales.grid_rowconfigure(1, weight=10)
@@ -210,7 +190,7 @@ class App(customtkinter.CTk):
 
         self.settings_title = customtkinter.CTkLabel(
             master=self.frame_settings, text='KFoSs-PC Settings',
-            text_font=('Roboto Medium', -24))
+            font=('Roboto Medium', -24))
         self.settings_title.grid(row=1, column=0, pady=10, padx=10)
 
         # Create and arrange settings_subframe_credentials
@@ -221,7 +201,7 @@ class App(customtkinter.CTk):
 
         self.credentials_title = customtkinter.CTkLabel(
             master=self.settings_subframe_credentials, text='Credentials',
-            text_font=('Roboto Medium', -24))
+            font=('Roboto Medium', -24))
         self.credentials_title.grid(row=0, column=0, columnspan=3,
                                     sticky='nswe', padx=20, pady=20)
 
@@ -261,7 +241,7 @@ class App(customtkinter.CTk):
 
         self.stores_title = customtkinter.CTkLabel(
             master=self.settings_subframe_stores, text='My Store',
-            text_font=('Roboto Medium', -24))
+            font=('Roboto Medium', -24))
         self.stores_title.grid(row=0, column=0, columnspan=3, sticky='nswe',
                                padx=20, pady=20)
 
@@ -429,7 +409,6 @@ class App(customtkinter.CTk):
         self.write_config('location', 'location_id', self.store_number)
         self.write_config('location', 'location_name', self.store_name)
         self.price_check_button.configure(state=tkinter.NORMAL)
-        self.historical_prices_button.configure(state=tkinter.NORMAL)
         self.best_sales_button.configure(state=tkinter.NORMAL)
         self.product_search_location.set(self.store_selection)
         # self.product_search_location.configure(width=500)
@@ -515,11 +494,7 @@ class App(customtkinter.CTk):
 
             # Set today's price for items
             today = datetime.now().strftime('%Y-%m-%d')
-            if upc in self.df.UPC.values:
-                self.df.loc[tuple((self.df['UPC'] == upc, [today]))] = \
-                    f'{reg_price}|{promo_price}'
-            else:
-                self.df = self.df.append({'UPC': upc, 'Brand': brand,
+            self.df = self.df.append({'UPC': upc, 'Brand': brand,
                                           'Description': description,
                                           'Size': size,
                                           'Sold By': sold_by,
@@ -537,7 +512,6 @@ class App(customtkinter.CTk):
                 command=lambda data=data: self.product_info_event(data))
             self.product_list_button.grid(row=i, column=0, columnspan=2,
                                           sticky='nswe', padx=10, pady=5)
-        self.df.to_csv('pricing-data.csv.xz', index=False)
 
     def product_info_event(self, data):
         for widget in self.subframe_product_info.winfo_children():
@@ -545,7 +519,7 @@ class App(customtkinter.CTk):
 
         self.info_desc = customtkinter.CTkLabel(
             master=self.subframe_product_info, text=data[1],
-            text_font=('', -18))
+            font=('', -18))
         self.info_desc.grid(row=0, column=0, columnspan=2,
                             padx=2, pady=15)
 
@@ -554,7 +528,7 @@ class App(customtkinter.CTk):
             text='UPC: ' + data[0],
             justify='left',
             anchor='w',
-            text_font=('', -14))
+            font=('', -14))
         self.info_upc.grid(row=1, column=0, sticky='nswe',
                            padx=5, pady=5)
 
@@ -563,7 +537,7 @@ class App(customtkinter.CTk):
             text='Size: ' + data[2],
             justify='left',
             anchor='w',
-            text_font=('', -14))
+            font=('', -14))
         self.info_size.grid(row=2, column=0, sticky='nswe',
                             padx=5, pady=5)
 
@@ -572,7 +546,7 @@ class App(customtkinter.CTk):
             text='Sold by: ' + data[3].lower(),
             justify='left',
             anchor='w',
-            text_font=('', -14))
+            font=('', -14))
         self.info_soldby.grid(row=3, column=0, sticky='nswe',
                               padx=5, pady=5)
 
@@ -581,7 +555,7 @@ class App(customtkinter.CTk):
             text='Regular price: ' + str('${:,.2f}'.format(data[4])),
             justify='left',
             anchor='w',
-            text_font=('', -14))
+            font=('', -14))
         self.info_reg_price.grid(row=4, column=0, sticky='nswe',
                                  padx=5, pady=5)
 
@@ -590,7 +564,7 @@ class App(customtkinter.CTk):
             text='Promo price: ' + str('${:,.2f}'.format(data[5])),
             justify='left',
             anchor='w',
-            text_font=('', -14))
+            font=('', -14))
         self.info_promo_price.grid(row=5, column=0, sticky='nswe',
                                    padx=5, pady=5)
 
@@ -605,7 +579,7 @@ class App(customtkinter.CTk):
             text='Unit price: ' + unit_price,
             justify='left',
             anchor='w',
-            text_font=('', -14))
+            font=('', -14))
         self.info_unit_price.grid(row=6, column=0, sticky='nswe',
                                   padx=5, pady=5)
 
@@ -614,7 +588,7 @@ class App(customtkinter.CTk):
             text='Percent discounted: ' + str(data[8]) + '%',
             justify='left',
             anchor='w',
-            text_font=('', -14))
+            font=('', -14))
         self.info_percent.grid(row=7, column=0, sticky='nswe',
                                padx=5, pady=5)
 
@@ -638,32 +612,12 @@ class App(customtkinter.CTk):
 
         self.info_picture = customtkinter.CTkLabel(
             master=self.subframe_product_info,
-            image=tkphoto)
+            image=tkphoto,
+            text='')
         self.info_picture.image = tkphoto
         self.info_picture.grid(row=1, column=1, sticky='nswe',
                                padx=5, pady=5, rowspan=7)
 
-        # Plot the historical data
-        single = self.df[self.df['UPC'] == data[0]]
-        single = single.drop(
-            columns=['UPC', 'Brand', 'Description', 'Size', 'Sold By'], axis=1)
-        split = single.apply(
-            lambda x: x.str.split('|').explode()).reset_index()
-        split = split.drop(split.columns[0], axis=1)
-        split = split.astype('float')
-        split = split.transpose()
-        split.rename(columns={0: 'Regular', 1: 'Promo'}, inplace=True)
-
-        fig = Figure(figsize=(7, 4), dpi=100)
-        ax = fig.add_subplot(111)
-        ax.yaxis.set_major_formatter('${x:1.2f}')
-        ax.xaxis.set_major_locator(plt.MaxNLocator(5))
-
-        split.plot(style=['ro-', 'b^-'], linewidth=2.0, ax=ax)
-
-        canvas = FigureCanvasTkAgg(fig, master=self.subframe_product_info,)
-        # canvas.show()
-        canvas.get_tk_widget().grid(row=8, column=0, columnspan=2)
 
     def sales_refresh_button_event(self):
         for widget in self.subframe_best_sales.winfo_children():
@@ -740,9 +694,6 @@ class App(customtkinter.CTk):
     def prices_button_event(self):
         self.frame_prices.lift()
 
-    def historical_button_event(self):
-        self.frame_historical_prices.lift()
-
     def settings_button_event(self):
         self.frame_settings.lift()
 
@@ -798,11 +749,9 @@ class App(customtkinter.CTk):
 
             self.stores_select_button.configure(state=tkinter.NORMAL)
             self.price_check_button.configure(state=tkinter.NORMAL)
-            self.historical_prices_button.configure(state=tkinter.NORMAL)
             self.best_sales_button.configure(state=tkinter.NORMAL)
             self.frame_prices.lift()
 
-        # self.pt.updateModel(TableModel(self.df))
 
 
 if __name__ == '__main__':
