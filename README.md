@@ -40,7 +40,7 @@ Dream goals:
 
 3. The "Products" API doesn't return some information that I wanted to see. For example, it doesn't provide unit prices or information about the percentage by which a product is discounted. With the help of the `pint` library, I wrote code to parse and display unit prices standardized for both liquid and solid measures. Some units returned by the API were unusable (especially ones including both count and size, which were inconsistent on whether the size was total or individual), and were excluded. Percentage discounts were a simpler subtraction of the promo price divided by the regular price from one, then standardized into a percentage.
 
-4. A themed and customized version of `tkinter`, `customtkinter`, provided a GUI framework to display, among other things, plots of both regular prices and promotional prices.
+4. The Blender-themed GUI toolkit `blenderui` provided a GUI framework to display, among other things, plots of both regular prices and promotional prices.
 
 # Running the program
 
@@ -95,7 +95,7 @@ Select the name of the chain, enter your ZIP code, find nearby stores, choose yo
 
 The code contained in this project is the product of my own mind.
 
-Thanks to [TomSchimansky](https://github.com/TomSchimansky) for the work done on `customtkinter` to update the look of Python's standard GUI library, as well as all the others who have worked on the libraries used in this project.
+Thanks to the developers of `blenderui` for the work done to provide Blender-themed interfaces for Python, as well as all the others who have worked on the libraries used in this project.
 
 Thanks to my wife for her unending support and love, throughout this project and always.
 
